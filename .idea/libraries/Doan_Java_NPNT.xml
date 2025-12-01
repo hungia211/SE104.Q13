@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Doan_Java_NPNT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/Doan_Java_NPNT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

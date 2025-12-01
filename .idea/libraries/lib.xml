@@ -1,0 +1,23 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/lib/jcalendar-0.8.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/html2pdf-4.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/common-image-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jsvg-1.4.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/poi-4.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/ojdbc11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/flatlaf-extras-3.4.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/itextpdf-5.5.13.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/commons-collections4-4.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/commons-codec-1.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/poi-ooxml-schemas-4.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/flatlaf-3.4.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/xmlbeans-3.0.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/poi-ooxml-4.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/commons-compress-1.18.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
