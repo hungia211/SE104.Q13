@@ -4,29 +4,19 @@ package Model;
 
 public class PhongModel {
     private int MaPhong;
-    private String LoaiPhong; 
-    private String KieuPhong;
-    private long GiaPhong;
+    private String MaLoai; 
+    private String TinhTrang;
     
     public PhongModel(){
         
     }
 
-    public PhongModel(int MaPhong, String LoaiPhong, String KieuPhong, long GiaPhong) {
+    public PhongModel(int MaPhong, String MaLoai, String TinhTrang) {
         this.MaPhong = MaPhong;
-        this.LoaiPhong = LoaiPhong;
-        this.KieuPhong = KieuPhong;
-        this.GiaPhong = GiaPhong;
+        this.MaLoai = MaLoai;
+        this.TinhTrang = TinhTrang;
     }
     
-    
-    
-    public PhongModel(int MaPhong, String LoaiPhong, String KieuPhong){
-        this.MaPhong = MaPhong;
-        this.LoaiPhong = LoaiPhong;
-        this.KieuPhong = KieuPhong;
-    }
-
     public int getMaPhong() {
         return MaPhong;
     }
@@ -35,29 +25,19 @@ public class PhongModel {
         this.MaPhong = MaPhong;
     }
 
-    public String getLoaiPhong() {
-        return LoaiPhong;
+    public String getMaLoai() {
+        return MaLoai;
     }
 
-    public void setLoaiPhong(String LoaiPhong) {
-        this.LoaiPhong = LoaiPhong;
+    public void setMaLoai(String MaLoai) {
+        this.MaLoai = MaLoai;
     }
 
-    public String getKieuPhong() {
-        return KieuPhong;
+    public String getTinhTrang() {
+        return TinhTrang;
     }
 
-    public void setKieuPhong(String KieuPhong) {
-        this.KieuPhong = KieuPhong;
+    public void setTinhTrang(String TinhTrang) {
+        this.TinhTrang = TinhTrang;
     }
-
-    public long getGiaPhong() {
-        return GiaPhong;
-    }
-
-    public void setGiaPhong(long GiaPhong) {
-        this.GiaPhong = GiaPhong;
-    }
-
-   
 }
