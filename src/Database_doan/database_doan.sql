@@ -73,7 +73,7 @@ CREATE TABLE LOAIPHONG (
 CREATE TABLE PHONG  (
   MaPhong NUMBER PRIMARY KEY,
   MaLoai NUMBER,
-  TinhTrang NVARCHAR2(10) --  'Trống', 'Đặt'
+  TinhTrang NVARCHAR2(10) --  'Bình thường', 'Bảo trì',
 );
 
 -- Tạo bảng chi tiết đặt phòng
@@ -440,7 +440,6 @@ TO_TIMESTAMP('07-02-2024 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1900000, 'Ngày');
 
 
-
 -- insert dữ liệu loại phòng
 INSERT INTO LOAIPHONG VALUES (1, 'A', 150000);
 INSERT INTO LOAIPHONG VALUES (2, 'B', 170000);
@@ -679,7 +678,6 @@ INSERT INTO TAOHOADON (MAHD, MANV) VALUES (15, 2);
 INSERT INTO TAOHOADON (MAHD, MANV) VALUES (16, 7);
 
 
-
 -- Insert dữ liệu chấm công cho 6 nhân viên
 INSERT INTO CHAMCONG (MaCC, MaNV, SoGioLamThem, SoNgayDiLam) VALUES (ChamCong_Seq.NEXTVAL, 1, 5, 18);
 INSERT INTO CHAMCONG (MaCC, MaNV, SoGioLamThem, SoNgayDiLam) VALUES (ChamCong_Seq.NEXTVAL, 2, 2, 4);
@@ -692,6 +690,12 @@ INSERT INTO CHAMCONG (MaCC, MaNV, SoGioLamThem, SoNgayDiLam) VALUES (ChamCong_Se
 INSERT INTO CHAMCONG (MaCC, MaNV, SoGioLamThem, SoNgayDiLam) VALUES (ChamCong_Seq.NEXTVAL, 9, 2, 11);
 INSERT INTO CHAMCONG (MaCC, MaNV, SoGioLamThem, SoNgayDiLam) VALUES (ChamCong_Seq.NEXTVAL, 10, 0, 14);
 INSERT INTO CHAMCONG (MaCC, MaNV, SoGioLamThem, SoNgayDiLam) VALUES (ChamCong_Seq.NEXTVAL, 11, 1, 2);
+
+-- Insert bảng tham số
+INSERT INTO THAMSO (TenThamSo, GiaTri) VALUES ('SoLuongKhachToiDa', 3);
+INSERT INTO THAMSO (TenThamSo, GiaTri) VALUES ('HeSoKhachNuocNgoai', 1.5);
+INSERT INTO THAMSO (TenThamSo, GiaTri) VALUES ('PhuThuKhachThu3', 0.25);
+INSERT INTO THAMSO (TenThamSo, GiaTri) VALUES ('PhanTramCoc', 0.3);
 
 
 
