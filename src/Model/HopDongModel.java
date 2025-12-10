@@ -1,52 +1,75 @@
+
 package Model;
 
 import java.time.LocalDateTime;
 
+
 public class HopDongModel {
     private int MaHopDong;
-    private int MaKH;
+    private int MaKH;  
     private LocalDateTime NgayLapHopDong;
     private LocalDateTime TGNhanPhong;
     private LocalDateTime TGTraPhong;
-    private int SoKhach;        // mới
-    private String LoaiKH;      // mới
+    private String TinhTrangHD;  
+    private int SoLuongNguoiLon;
+    private int SoLuongTreEm;
+    private double TriGiaHopDong; 
     private String HinhThucThue;
-
-    public HopDongModel() {
+    
+    public HopDongModel(){
+    
     }
 
-    // Constructor đầy đủ (có MaHopDong – dùng khi select từ DB)
-    public HopDongModel(int MaHopDong, int MaKH,
-                        LocalDateTime NgayLapHopDong,
-                        LocalDateTime TGNhanPhong,
-                        LocalDateTime TGTraPhong,
-                        int SoKhach,
-                        String LoaiKH,
-                        String HinhThucThue) {
+    public HopDongModel(int MaHopDong, int MaKH, LocalDateTime NgayLapHopDong, LocalDateTime TGNhanPhong, LocalDateTime TGTraPhong, String TinhTrangHD, int SoLuongNguoiLon, int SoLuongTreEm, double TriGiaHopDong) {
         this.MaHopDong = MaHopDong;
         this.MaKH = MaKH;
         this.NgayLapHopDong = NgayLapHopDong;
         this.TGNhanPhong = TGNhanPhong;
         this.TGTraPhong = TGTraPhong;
-        this.SoKhach = SoKhach;
-        this.LoaiKH = LoaiKH;
-        this.HinhThucThue = HinhThucThue;
+        this.TinhTrangHD = TinhTrangHD;
+        this.SoLuongNguoiLon = SoLuongNguoiLon;
+        this.SoLuongTreEm = SoLuongTreEm;
+        this.TriGiaHopDong = TriGiaHopDong;
     }
+    
+    
 
-    // Constructor không có MaHopDong (dùng khi insert)
-    public HopDongModel(int MaKH,
-                        LocalDateTime NgayLapHopDong,
-                        LocalDateTime TGNhanPhong,
-                        LocalDateTime TGTraPhong,
-                        int SoKhach,
-                        String LoaiKH,
-                        String HinhThucThue) {
+    public HopDongModel(int MaKH, LocalDateTime NgayLapHopDong, LocalDateTime TGNhanPhong, LocalDateTime TGTraPhong, String TinhTrangHD, int SoLuongNguoiLon, int SoLuongTreEm, double TriGiaHopDong) {
         this.MaKH = MaKH;
         this.NgayLapHopDong = NgayLapHopDong;
         this.TGNhanPhong = TGNhanPhong;
         this.TGTraPhong = TGTraPhong;
-        this.SoKhach = SoKhach;
-        this.LoaiKH = LoaiKH;
+        this.TinhTrangHD = TinhTrangHD;
+        this.SoLuongNguoiLon = SoLuongNguoiLon;
+        this.SoLuongTreEm = SoLuongTreEm;
+        this.TriGiaHopDong = TriGiaHopDong;
+    }
+    
+    
+
+    public HopDongModel(int MaKH, LocalDateTime NgayLapHopDong, LocalDateTime TGNhanPhong, LocalDateTime TGTraPhong, String TinhTrangHD, int SoLuongNguoiLon, int SoLuongTreEm, double TriGiaHopDong, String HinhThucThue) {
+        this.MaKH = MaKH;
+        this.NgayLapHopDong = NgayLapHopDong;
+        this.TGNhanPhong = TGNhanPhong;
+        this.TGTraPhong = TGTraPhong;
+        this.TinhTrangHD = TinhTrangHD;
+        this.SoLuongNguoiLon = SoLuongNguoiLon;
+        this.SoLuongTreEm = SoLuongTreEm;
+        this.TriGiaHopDong = TriGiaHopDong;
+        this.HinhThucThue = HinhThucThue;
+    }
+    
+    
+    public HopDongModel(int MaHopDong, int MaKH, LocalDateTime NgayLapHopDong, LocalDateTime TGNhanPhong, LocalDateTime TGTraPhong, String TinhTrangHD, int SoLuongNguoiLon, int SoLuongTreEm, double TriGiaHopDong, String HinhThucThue){
+        this.MaHopDong = MaHopDong;
+        this.MaKH = MaKH;
+        this.NgayLapHopDong = NgayLapHopDong;
+        this.TGNhanPhong = TGNhanPhong;
+        this.TGTraPhong = TGTraPhong;
+        this.TinhTrangHD = TinhTrangHD;
+        this.SoLuongNguoiLon = SoLuongNguoiLon;
+        this.SoLuongTreEm = SoLuongTreEm;
+        this.TriGiaHopDong = TriGiaHopDong;
         this.HinhThucThue = HinhThucThue;
     }
 
@@ -90,20 +113,36 @@ public class HopDongModel {
         this.TGTraPhong = TGTraPhong;
     }
 
-    public int getSoKhach() {
-        return SoKhach;
+    public String getTinhTrangHD() {
+        return TinhTrangHD;
     }
 
-    public void setSoKhach(int SoKhach) {
-        this.SoKhach = SoKhach;
+    public void setTinhTrangHD(String TinhTrangHD) {
+        this.TinhTrangHD = TinhTrangHD;
     }
 
-    public String getLoaiKH() {
-        return LoaiKH;
+    public int getSoLuongNguoiLon() {
+        return SoLuongNguoiLon;
     }
 
-    public void setLoaiKH(String LoaiKH) {
-        this.LoaiKH = LoaiKH;
+    public void setSoLuongNguoiLon(int SoLuongNguoiLon) {
+        this.SoLuongNguoiLon = SoLuongNguoiLon;
+    }
+
+    public int getSoLuongTreEm() {
+        return SoLuongTreEm;
+    }
+
+    public void setSoLuongTreEm(int SoLuongTreEm) {
+        this.SoLuongTreEm = SoLuongTreEm;
+    }
+
+    public double getTriGiaHopDong() {
+        return TriGiaHopDong;
+    }
+
+    public void setTriGiaHopDong(double TriGiaHopDong) {
+        this.TriGiaHopDong = TriGiaHopDong;
     }
 
     public String getHinhThucThue() {
@@ -113,4 +152,5 @@ public class HopDongModel {
     public void setHinhThucThue(String HinhThucThue) {
         this.HinhThucThue = HinhThucThue;
     }
+    
 }
