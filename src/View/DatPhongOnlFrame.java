@@ -65,10 +65,10 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
     public void khoiTaoBang() {
         defaultTableModel = new DefaultTableModel();
 
-        defaultTableModel.addColumn("Số phòng");
-        defaultTableModel.addColumn("Loại phòng");
-        defaultTableModel.addColumn("Kiểu phòng");
-        defaultTableModel.addColumn("Giá phòng");
+        defaultTableModel.addColumn("Mã Phòng");
+        defaultTableModel.addColumn("Tên Loại phòng");
+        defaultTableModel.addColumn("Tinh Trạng");
+        defaultTableModel.addColumn("Giá Phòng");
 
         danhSachPhongjTable.setModel(defaultTableModel);
         danhSachPhongjTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -77,15 +77,15 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
 
     public void inDanhSach() {
         // Tạo đối tượng danh sách phòng
-        ArrayList<PhongModel> DS_Phong = PhongDAO.hungia_getDSPhong();
+        ArrayList<PhongModel> DS_Phong = PhongDAO.hungia_getDSPhongBinhThuong();
 
         // Xóa tất cả các hàng hiện có trong bảng
         defaultTableModel.setRowCount(0);
 
         // Thêm dữ liệu vào bảng
-        for (PhongModel phong : DS_Phong) {
+        for (PhongModel ph : DS_Phong) {
             defaultTableModel.addRow(new Object[]{
-                phong.getMaPhong(), phong.getLoaiPhong(), phong.getKieuPhong(), phong.getGiaPhong()
+                ph.getMaPhong(), ph.getLoaiPhong().getTenloai(), ph.getTinhTrang(), ph.getLoaiPhong().getGia()
             });
         }
 
@@ -115,42 +115,82 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
 
         return dateStr;
     }
-
+    
     public void TraCuuPhong() {
+
         // Lấy dữ liệu tìm kiếm 
-        String loaiphong = (String) this.loaiPhongjComboBox.getSelectedItem();
-        String kieuphong = (String) this.kieuPhongjComboBox.getSelectedItem();
+        String loaiPhong = (String) this.loaiPhongjComboBox.getSelectedItem();
+        String tangStr = (String) this.kieuPhongjComboBox.getSelectedItem();
 
         String ngayNhan = doiNgay(this.ngayNhanjCalendarComboBox.getDate()) + " 14:00:00";
         String ngayTra = doiNgay(this.ngayTrajCalendarComboBox.getDate()) + " 12:00:00";
 
         ArrayList<PhongModel> DS_Phong;
 
-        // Xóa tất cả các hàng trong bảng
+        // Xóa bảng cũ
         defaultTableModel.setRowCount(0);
 
-        if ("Tất cả".equals(loaiphong) && "Tất cả".equals(kieuphong)) {
-            DS_Phong = PhongDAO.hungia_getDStheoNgay(ngayNhan, ngayTra);
-        } else if ("Tất cả".equals(loaiphong)) {
-            DS_Phong = PhongDAO.hungia_getDStheoKieuPhong(kieuphong, ngayNhan, ngayTra);
-        } else if ("Tất cả".equals(kieuphong)) {
-            DS_Phong = PhongDAO.hungia_getDStheoLoaiPhong(loaiphong, ngayNhan, ngayTra);
+        // -------------------------------
+        // 1) Người dùng chọn TẤT CẢ loại + TẤT CẢ tầng
+        // -------------------------------
+        if (loaiPhong.equals("Tất cả") && tangStr.equals("Tất cả")) {
+
+            DS_Phong = PhongDAO.hungia_getDStheoNgayBinhThuong(ngayNhan, ngayTra);
+
+            // -------------------------------
+            // 2) Người dùng chọn TẦNG nhưng loại phòng = Tất cả
+            // -------------------------------
+        } else if (loaiPhong.equals("Tất cả")) {
+
+            int tang = 0;
+            if (!tangStr.equals("Tất cả")) {
+                tang = Integer.parseInt(tangStr.split(" ")[1]);   // "Tầng 2" → 2
+            }
+
+            DS_Phong = PhongDAO.hungia_getDStheoTangBinhThuong(tang, ngayNhan, ngayTra);
+
+            // -------------------------------
+            // 3) Người dùng chọn LOẠI PHÒNG nhưng tầng = Tất cả
+            // -------------------------------
+        } else if (tangStr.equals("Tất cả")) {
+
+            DS_Phong = PhongDAO.hungia_getDStheoLoaiPhongBinhThuong(loaiPhong, ngayNhan, ngayTra);
+
+            // -------------------------------
+            // 4) Người dùng chọn CẢ LOẠI và TẦNG
+            // -------------------------------
         } else {
-            DS_Phong = PhongDAO.hungia_getDStheotracuu(loaiphong, kieuphong, ngayNhan, ngayTra);
+
+            int tang = Integer.parseInt(tangStr.split(" ")[1]);
+
+            DS_Phong = PhongDAO.hungia_getDStheotracuuBinhThuong(loaiPhong, tang, ngayNhan, ngayTra);
         }
 
-        // Thêm dữ liệu vào bảng
-        for (PhongModel phong : DS_Phong) {
+        // -------------------------------
+        // HIỂN THỊ LÊN BẢNG
+        // -------------------------------
+        for (PhongModel ph : DS_Phong) {
             defaultTableModel.addRow(new Object[]{
-                phong.getMaPhong(), phong.getLoaiPhong(), phong.getKieuPhong(), phong.getGiaPhong()
+                ph.getMaPhong(),
+                ph.getLoaiPhong().getTenloai(),
+                ph.getTinhTrang(),
+                ph.getLoaiPhong().getGia()
             });
         }
 
-        // Hiển thị thông báo nếu không tìm thấy kết quả
-        if (DS_Phong.size() <= 0) {
-            JOptionPane.showMessageDialog(rootPane, "Vào thời gian này không có phòng trống. Vui lòng thử lại với phòng khác!", "Thông báo", JOptionPane.ERROR_MESSAGE);
+        // -------------------------------
+        // Thông báo nếu không có dữ liệu
+        // -------------------------------
+        if (DS_Phong.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    rootPane,
+                    "Vào thời gian này không có phòng trống. Vui lòng thử lại!",
+                    "Thông báo",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
+
 
     public void capNhatThongTin() {
         // Lấy thông tin nhập liệu mới
@@ -225,7 +265,7 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
         long sum = 0;
         for (int mp : maPhong) {
             PhongModel p = PhongDAO.getPhongTheoMa(mp);
-            sum += p.getGiaPhong();
+            sum += p.getLoaiPhong().getGia();
         }
         return khoangtg * sum * 30 / 100;
     }
@@ -320,10 +360,10 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
         DatPhongPanel.setBackground(new java.awt.Color(255, 255, 255));
 
         loaiPhongjComboBox.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        loaiPhongjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "VIP", "Thường" }));
+        loaiPhongjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "A", "B", "C" }));
 
         kieuPhongjComboBox.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        kieuPhongjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "Đơn", "Đôi" }));
+        kieuPhongjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4" }));
 
         traCuuPhongjButton.setBackground(new java.awt.Color(0, 51, 153));
         traCuuPhongjButton.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
@@ -341,7 +381,7 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Kiểu Phòng");
+        jLabel3.setText("Tầng");
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 0, 0));
@@ -483,7 +523,7 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(DPhong_jButton))
                             .addGroup(DatPhongPanelLayout.createSequentialGroup()
-                                .addGroup(DatPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(DatPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jLabel4)
                                     .addComponent(ngayNhanjCalendarComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel5)
@@ -494,12 +534,12 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
                                         .addComponent(loaiPhongjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(DatPhongPanelLayout.createSequentialGroup()
                                         .addComponent(jLabel3)
-                                        .addGap(19, 19, 19)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(kieuPhongjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(DatPhongPanelLayout.createSequentialGroup()
                                         .addGap(100, 100, 100)
                                         .addComponent(traCuuPhongjButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 548, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(53, 53, 53))))
         );
@@ -531,7 +571,7 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(loaiPhongjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(19, 19, 19)
-                        .addGroup(DatPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(DatPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(kieuPhongjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(39, 39, 39)
@@ -539,7 +579,7 @@ public class DatPhongOnlFrame extends javax.swing.JFrame {
                     .addGroup(DatPhongPanelLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
                 .addComponent(DPhong_jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36))
         );

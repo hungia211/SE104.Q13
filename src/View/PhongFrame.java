@@ -100,8 +100,8 @@ public class PhongFrame extends javax.swing.JFrame {
     public void khoiTaoBang() {
         defaultTableModel = new DefaultTableModel();
         defaultTableModel.addColumn("Mã Phòng");
-        defaultTableModel.addColumn("Loại phòng");
-        defaultTableModel.addColumn("Kiểu phòng");
+        defaultTableModel.addColumn("Tên Loại phòng");
+        defaultTableModel.addColumn("Tinh Trạng");
         defaultTableModel.addColumn("Giá Phòng");
 
         danhSachPHONGTable.setModel(defaultTableModel);
@@ -118,7 +118,7 @@ public class PhongFrame extends javax.swing.JFrame {
         // Thêm dữ liệu vào bảng
         for (PhongModel ph : DS_PHONG) {
             defaultTableModel.addRow(new Object[]{
-                ph.getMaPhong(), ph.getLoaiPhong(), ph.getKieuPhong(), ph.getGiaPhong()
+                ph.getMaPhong(), ph.getLoaiPhong().getTenloai(), ph.getTinhTrang(), ph.getLoaiPhong().getGia()
             });
         }
 
@@ -150,28 +150,61 @@ public class PhongFrame extends javax.swing.JFrame {
     }
 
     public void TraCuuPhongCoTime() {
-        // Lấy tùy chọn tìm kiếm và đầu vào từ người dùng
-        String loaiphong = (String) jComboBox1.getSelectedItem();
-        String kieuphong = (String) jComboBox2.getSelectedItem();
+        // Lấy lựa chọn từ UI
+        String loaiPhong = (String) jComboBox1.getSelectedItem();   // A, B, C, Tất cả
+        String tangStr = (String) jComboBox2.getSelectedItem();     // Tầng 1, Tầng 2, Tất cả
+
         // Lấy giờ từ JTextField và ngày từ JCalendarComboBox
         String checkInStr = checkInTime.getText();
         String checkOutStr = checkOutTime.getText();
+
         String checkInDateTimeStr = doiNgay(checkInDate.getDate()) + " " + checkInStr;
         String checkOutDateTimeStr = doiNgay(checkOutDate.getDate()) + " " + checkOutStr;
+
         System.out.println(checkInDateTimeStr);
         System.out.println(checkOutDateTimeStr);
+
+        ArrayList<PhongModel> DS_Phong;
+
         // Xóa tất cả các hàng trong bảng
         defaultTableModel.setRowCount(0);
 
-        if ("Tất cả".equals(loaiphong) && "Tất cả".equals(kieuphong)) {
-            DS_PHONG = PhongDAO.ttun_getDStheoThoiGian(checkInDateTimeStr, checkOutDateTimeStr);
-        } else if ("Tất cả".equals(loaiphong)) {
-            DS_PHONG = PhongDAO.ttun_getDStheoKieuPhong(kieuphong, checkInDateTimeStr, checkOutDateTimeStr);
-        } else if ("Tất cả".equals(kieuphong)) {
-            DS_PHONG = PhongDAO.ttun_getDStheoLoaiPhong(loaiphong, checkInDateTimeStr, checkOutDateTimeStr);
+        // -------------------------------
+        // 1) Người dùng chọn TẤT CẢ loại + TẤT CẢ tầng
+        // -------------------------------
+        if (loaiPhong.equals("Tất cả") && tangStr.equals("Tất cả")) {
+
+            DS_Phong = PhongDAO.hungia_getDStheoNgay(checkInDateTimeStr, checkOutDateTimeStr);
+
+            // -------------------------------
+            // 2) Người dùng chọn TẦNG nhưng loại phòng = Tất cả
+            // -------------------------------
+        } else if (loaiPhong.equals("Tất cả")) {
+
+            int tang = 0;
+            if (!tangStr.equals("Tất cả")) {
+                tang = Integer.parseInt(tangStr.split(" ")[1]);   // "Tầng 2" → 2
+            }
+
+            DS_Phong = PhongDAO.hungia_getDStheoTang(tang, checkInDateTimeStr, checkOutDateTimeStr);
+
+            // -------------------------------
+            // 3) Người dùng chọn LOẠI PHÒNG nhưng tầng = Tất cả
+            // -------------------------------
+        } else if (tangStr.equals("Tất cả")) {
+
+            DS_Phong = PhongDAO.hungia_getDStheoLoaiPhong(loaiPhong, checkInDateTimeStr, checkOutDateTimeStr);
+
+            // -------------------------------
+            // 4) Người dùng chọn CẢ LOẠI và TẦNG
+            // -------------------------------
         } else {
-            DS_PHONG = PhongDAO.ttun_getDStheoTraCuu(loaiphong, kieuphong, checkInDateTimeStr, checkOutDateTimeStr);
+
+            int tang = Integer.parseInt(tangStr.split(" ")[1]);
+
+            DS_Phong = PhongDAO.hungia_getDStheotracuu(loaiPhong, tang, checkInDateTimeStr, checkOutDateTimeStr);
         }
+
         // Kiểm tra chuỗi giờ rỗng
         if (checkInStr.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập giờ check-in", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
@@ -184,7 +217,7 @@ public class PhongFrame extends javax.swing.JFrame {
         // Thêm kết quả tìm kiếm vào bảng
         for (PhongModel ph : DS_PHONG) {
             defaultTableModel.addRow(new Object[]{
-                ph.getMaPhong(), ph.getLoaiPhong(), ph.getKieuPhong(), ph.getGiaPhong()
+                ph.getMaPhong(), ph.getLoaiPhong().getTenloai(), ph.getTinhTrang(), ph.getLoaiPhong().getGia()
             });
         }
         // Hiển thị thông báo nếu không tìm thấy kết quả
@@ -194,38 +227,78 @@ public class PhongFrame extends javax.swing.JFrame {
     }
 
     public void TraCuuPhongKhongTime() {
-        // Lấy dữ liệu tìm kiếm 
-        String loaiphong = (String) this.jComboBox1.getSelectedItem();
-        String kieuphong = (String) this.jComboBox2.getSelectedItem();
 
-        String ngayNhan = doiNgay(this.checkInDate.getDate()) + " 14:00:00";
-        String ngayTra = doiNgay(this.checkOutDate.getDate()) + " 12:00:00";
+        // Lấy lựa chọn từ UI
+        String loaiPhong = (String) jComboBox1.getSelectedItem();   // A, B, C, Tất cả
+        String tangStr = (String) jComboBox2.getSelectedItem();     // Tầng 1, Tầng 2, Tất cả
+
+        // Lấy ngày checkin / checkout
+        String ngayNhan = doiNgay(checkInDate.getDate()) + " 14:00:00";
+        String ngayTra = doiNgay(checkOutDate.getDate()) + " 12:00:00";
 
         ArrayList<PhongModel> DS_Phong;
 
-        // Xóa tất cả các hàng trong bảng
+        // Xóa bảng cũ
         defaultTableModel.setRowCount(0);
 
-        if ("Tất cả".equals(loaiphong) && "Tất cả".equals(kieuphong)) {
+        // -------------------------------
+        // 1) Người dùng chọn TẤT CẢ loại + TẤT CẢ tầng
+        // -------------------------------
+        if (loaiPhong.equals("Tất cả") && tangStr.equals("Tất cả")) {
+
             DS_Phong = PhongDAO.hungia_getDStheoNgay(ngayNhan, ngayTra);
-        } else if ("Tất cả".equals(loaiphong)) {
-            DS_Phong = PhongDAO.hungia_getDStheoKieuPhong(kieuphong, ngayNhan, ngayTra);
-        } else if ("Tất cả".equals(kieuphong)) {
-            DS_Phong = PhongDAO.hungia_getDStheoLoaiPhong(loaiphong, ngayNhan, ngayTra);
+
+            // -------------------------------
+            // 2) Người dùng chọn TẦNG nhưng loại phòng = Tất cả
+            // -------------------------------
+        } else if (loaiPhong.equals("Tất cả")) {
+
+            int tang = 0;
+            if (!tangStr.equals("Tất cả")) {
+                tang = Integer.parseInt(tangStr.split(" ")[1]);   // "Tầng 2" → 2
+            }
+
+            DS_Phong = PhongDAO.hungia_getDStheoTang(tang, ngayNhan, ngayTra);
+
+            // -------------------------------
+            // 3) Người dùng chọn LOẠI PHÒNG nhưng tầng = Tất cả
+            // -------------------------------
+        } else if (tangStr.equals("Tất cả")) {
+
+            DS_Phong = PhongDAO.hungia_getDStheoLoaiPhong(loaiPhong, ngayNhan, ngayTra);
+
+            // -------------------------------
+            // 4) Người dùng chọn CẢ LOẠI và TẦNG
+            // -------------------------------
         } else {
-            DS_Phong = PhongDAO.hungia_getDStheotracuu(loaiphong, kieuphong, ngayNhan, ngayTra);
+
+            int tang = Integer.parseInt(tangStr.split(" ")[1]);
+
+            DS_Phong = PhongDAO.hungia_getDStheotracuu(loaiPhong, tang, ngayNhan, ngayTra);
         }
 
-        // Thêm dữ liệu vào bảng
-        for (PhongModel phong : DS_Phong) {
+        // -------------------------------
+        // HIỂN THỊ LÊN BẢNG
+        // -------------------------------
+        for (PhongModel ph : DS_Phong) {
             defaultTableModel.addRow(new Object[]{
-                phong.getMaPhong(), phong.getLoaiPhong(), phong.getKieuPhong(), phong.getGiaPhong()
+                ph.getMaPhong(),
+                ph.getLoaiPhong().getTenloai(),
+                ph.getTinhTrang(),
+                ph.getLoaiPhong().getGia()
             });
         }
 
-        // Hiển thị thông báo nếu không tìm thấy kết quả
-        if (DS_Phong.size() <= 0) {
-            JOptionPane.showMessageDialog(rootPane, "Vào thời gian này không có phòng trống. Vui lòng thử lại với phòng khác!", "Thông báo", JOptionPane.ERROR_MESSAGE);
+        // -------------------------------
+        // Thông báo nếu không có dữ liệu
+        // -------------------------------
+        if (DS_Phong.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    rootPane,
+                    "Vào thời gian này không có phòng trống. Vui lòng thử lại!",
+                    "Thông báo",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -392,11 +465,9 @@ public class PhongFrame extends javax.swing.JFrame {
         checkOutTime = new javax.swing.JTextField();
         traCuujButton1 = new javax.swing.JButton();
         datPhongjButton2 = new javax.swing.JButton();
+        datPhongjButton3 = new javax.swing.JButton();
 
-        // setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        // sửa lại cho không bị chớp
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         MenuPanel.setBackground(new java.awt.Color(24, 24, 68));
         MenuPanel.setPreferredSize(new java.awt.Dimension(200, 600));
@@ -1012,12 +1083,12 @@ public class PhongFrame extends javax.swing.JFrame {
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel5.setText("Kiểu phòng");
+        jLabel5.setText("Tầng");
 
         jComboBox2.setBackground(new java.awt.Color(255, 255, 255));
         jComboBox2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jComboBox2.setForeground(new java.awt.Color(0, 0, 0));
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "Đơn", "Đôi" }));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4" }));
         jComboBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2ActionPerformed(evt);
@@ -1027,7 +1098,7 @@ public class PhongFrame extends javax.swing.JFrame {
         jComboBox1.setBackground(new java.awt.Color(255, 255, 255));
         jComboBox1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jComboBox1.setForeground(new java.awt.Color(0, 0, 0));
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "Thường", "VIP" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "A", "B", "C" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -1072,6 +1143,16 @@ public class PhongFrame extends javax.swing.JFrame {
             }
         });
 
+        datPhongjButton3.setBackground(new java.awt.Color(24, 24, 68));
+        datPhongjButton3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        datPhongjButton3.setForeground(new java.awt.Color(255, 255, 255));
+        datPhongjButton3.setText("Cập nhật tình trạng");
+        datPhongjButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                datPhongjButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout TraCuuPhongPanelLayout = new javax.swing.GroupLayout(TraCuuPhongPanel);
         TraCuuPhongPanel.setLayout(TraCuuPhongPanelLayout);
         TraCuuPhongPanelLayout.setHorizontalGroup(
@@ -1090,7 +1171,9 @@ public class PhongFrame extends javax.swing.JFrame {
                         .addGap(32, 32, 32)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 630, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(TraCuuPhongPanelLayout.createSequentialGroup()
-                        .addGap(550, 550, 550)
+                        .addGap(376, 376, 376)
+                        .addComponent(datPhongjButton3)
+                        .addGap(18, 18, 18)
                         .addComponent(datPhongjButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(TraCuuPhongPanelLayout.createSequentialGroup()
                         .addGap(30, 30, 30)
@@ -1100,8 +1183,8 @@ public class PhongFrame extends javax.swing.JFrame {
                                 .addGap(15, 15, 15)
                                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(40, 40, 40)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(5, 5, 5)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(TraCuuPhongPanelLayout.createSequentialGroup()
                                 .addGroup(TraCuuPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1120,12 +1203,13 @@ public class PhongFrame extends javax.swing.JFrame {
             .addGroup(TraCuuPhongPanelLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addComponent(jLabel8)
-                .addGap(16, 16, 16)
+                .addGap(11, 11, 11)
                 .addGroup(TraCuuPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(TraCuuPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(10, 10, 10)
                 .addGroup(TraCuuPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
@@ -1142,7 +1226,9 @@ public class PhongFrame extends javax.swing.JFrame {
                 .addGap(10, 10, 10)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24)
-                .addComponent(datPhongjButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(TraCuuPhongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(datPhongjButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(datPhongjButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         mainPanel.add(TraCuuPhongPanel, "card2");
@@ -1159,7 +1245,7 @@ public class PhongFrame extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(MenuPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
         );
 
         pack();
@@ -1488,6 +1574,60 @@ public class PhongFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_checkInTimeActionPerformed
 
+    private void datPhongjButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_datPhongjButton3ActionPerformed
+        int[] selectedRows = danhSachPHONGTable.getSelectedRows();
+
+        if (selectedRows.length == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn phòng!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Hỏi xác nhận trước khi cập nhật
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có chắc muốn cập nhật tình trạng của " + selectedRows.length + " phòng?",
+                "Xác nhận cập nhật",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return; // Người dùng bấm NO
+        }
+
+        // Xử lý từng phòng
+        for (int row : selectedRows) {
+
+            int maPhong = (int) danhSachPHONGTable.getValueAt(row, 0);
+
+            // Lấy trạng thái hiện tại từ DB
+            String curr = PhongDAO.getTinhTrangPhong(maPhong);
+
+            if (curr == null) {
+                continue;
+            }
+
+            // Toggle tình trạng
+            String newStatus = curr.equals("Bình thường") ? "Bảo trì" : "Bình thường";
+
+            // Cập nhật DB
+            PhongDAO.updateTinhTrang(maPhong, newStatus);
+        }
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Cập nhật tình trạng thành công!",
+                "Thông báo",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        // Load lại bảng
+        TraCuuPhongKhongTime();
+    }//GEN-LAST:event_datPhongjButton3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1537,6 +1677,7 @@ public class PhongFrame extends javax.swing.JFrame {
     private javax.swing.JTextField checkOutTime;
     private javax.swing.JTable danhSachPHONGTable;
     private javax.swing.JButton datPhongjButton2;
+    private javax.swing.JButton datPhongjButton3;
     private javax.swing.JLabel hdong_CCCDjLable;
     private javax.swing.JLabel hdong_DiaChijLabel;
     private javax.swing.JLabel hdong_GioiTinhjLabel;
