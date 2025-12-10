@@ -4,29 +4,39 @@ package Model;
 
 public class PhongModel {
     private int MaPhong;
-    private String LoaiPhong; 
-    private String KieuPhong;
-    private long GiaPhong;
+//    private String LoaiPhong; 
+//    private String KieuPhong;
+//    private long GiaPhong;
+    private String TinhTrang;
+    private LoaiPhongModel LoaiPhong;   // chứa cả object
+
+    public PhongModel(int MaPhong, LoaiPhongModel LoaiPhong, String TinhTrang) {
+        this.MaPhong = MaPhong;
+        this.LoaiPhong = LoaiPhong;
+        this.TinhTrang = TinhTrang;
+    }
     
     public PhongModel(){
         
     }
 
-    public PhongModel(int MaPhong, String LoaiPhong, String KieuPhong, long GiaPhong) {
-        this.MaPhong = MaPhong;
-        this.LoaiPhong = LoaiPhong;
-        this.KieuPhong = KieuPhong;
-        this.GiaPhong = GiaPhong;
-    }
-    
-    
-    
-    public PhongModel(int MaPhong, String LoaiPhong, String KieuPhong){
-        this.MaPhong = MaPhong;
-        this.LoaiPhong = LoaiPhong;
-        this.KieuPhong = KieuPhong;
+    public LoaiPhongModel getLoaiPhong() {
+        return LoaiPhong;
     }
 
+    public void setLoaiPhong(LoaiPhongModel LoaiPhong) {
+        this.LoaiPhong = LoaiPhong;
+    }
+
+    public String getTinhTrang() {
+        return TinhTrang;
+    }
+
+    public void setTinhTrang(String TinhTrang) {
+        this.TinhTrang = TinhTrang;
+    }
+    
+    
     public int getMaPhong() {
         return MaPhong;
     }
@@ -34,30 +44,6 @@ public class PhongModel {
     public void setMaPhong(int MaPhong) {
         this.MaPhong = MaPhong;
     }
-
-    public String getLoaiPhong() {
-        return LoaiPhong;
-    }
-
-    public void setLoaiPhong(String LoaiPhong) {
-        this.LoaiPhong = LoaiPhong;
-    }
-
-    public String getKieuPhong() {
-        return KieuPhong;
-    }
-
-    public void setKieuPhong(String KieuPhong) {
-        this.KieuPhong = KieuPhong;
-    }
-
-    public long getGiaPhong() {
-        return GiaPhong;
-    }
-
-    public void setGiaPhong(long GiaPhong) {
-        this.GiaPhong = GiaPhong;
-    }
-
+  
    
 }
