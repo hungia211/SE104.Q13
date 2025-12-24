@@ -510,6 +510,7 @@ public class HopDongDAO {
                         double giaMotGio = giaNgay / 22.0 * 1.5;
                         double tienMotGio = giaMotGio;
 
+<<<<<<< HEAD
                         // --- Phu thu neu vuot so khach toi da ---
                         if (soKhach >= soKhachToiDa) {
                             int soKhachVuot = soKhach - soKhachToiDa;
@@ -517,6 +518,15 @@ public class HopDongDAO {
                             tienMotGio += phuThuThemKhach;
                             System.out.println("Phu thu them khach (gio): " + phuThuThemKhach);
                         }
+=======
+                       // --- Phu thu neu vuot so khach toi da ---
+                       if (soKhach >= soKhachToiDa) {
+                           int soKhachVuot = 1;
+                           double phuThuThemKhach = giaMotGio * phuThuKhachThu3 * soKhachVuot;
+                           tienMotGio += phuThuThemKhach;
+                           System.out.println("Phu thu them khach (gio): " + phuThuThemKhach);
+                       }
+>>>>>>> f408795d0e8af5d8bd917166f4bde360350e0e45
 
                         double tienPhongTheoGio = tienMotGio * soGioThue;
                         if (loaiKH != null
