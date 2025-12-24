@@ -28,9 +28,7 @@ public class HopDongDAO {
 
         String sql = "SELECT * FROM HOPDONG ORDER BY MAHOPDONG DESC";
 
-        try (Connection conn = JDBCUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = JDBCUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             DS_HopDong.clear();
 
@@ -157,13 +155,12 @@ public class HopDongDAO {
         }
     }
 
-public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException {
+    public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException {
         String sql = "SELECT * FROM HOPDONG WHERE MAHOPDONG = ?";
 
         HopDongModel hopDong = null;
 
-        try (Connection conn = JDBCUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = JDBCUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, maHopDong);
             try (ResultSet rs = ps.executeQuery()) {
@@ -194,8 +191,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
     public static boolean CapNhatHopDong(int maHopDong, HopDongModel hopDong) {
         String sql = "UPDATE HOPDONG SET TINHTRANGHD = ? WHERE MAHOPDONG = ?";
 
-        try (Connection con = JDBCUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = JDBCUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             // FIX: index param
             ps.setString(1, hopDong.getTinhTrangHD());
@@ -220,117 +216,117 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
     }
 
     public int hungia_ThemHopDongVaCTDP(int makh,
-                                           String ngayNhan,
-                                           String ngayTra,
-                                           int soNL,
-                                           int soTE,
-                                           long tien,
-                                           List<Integer> soPhongDatList) throws SQLException {
-           Connection con = null;
+            String ngayNhan,
+            String ngayTra,
+            int soNL,
+            int soTE,
+            long tien,
+            List<Integer> soPhongDatList) throws SQLException {
+        Connection con = null;
 
-           try {
-               con = JDBCUtil.getConnection();
-               con.setAutoCommit(false);
+        try {
+            con = JDBCUtil.getConnection();
+            con.setAutoCommit(false);
 
-               // Bảng HOPDONG: MaHopDong, MaKH, NgayLapHopDong, TGNhanPhong, TGTraPhong,
-               // TinhTrangHD, LoaiKH, TriGiaHD, HinhThucThue
-               // -> Không có cột số người, chỉ lưu tiền + hình thức thuê
-               String sqlHopDong =
-                       "INSERT INTO HOPDONG (MaHopDong, MaKH, NgayLapHopDong, TGNhanPhong, TGTraPhong, TinhTrangHD, TriGiaHD, HinhThucThue) " +
-                       "VALUES (HopDong_Seq.NEXTVAL, ?, SYSTIMESTAMP, " +
-                       "TO_TIMESTAMP(?, 'DD-MM-YYYY HH24:MI:SS'), " +
-                       "TO_TIMESTAMP(?, 'DD-MM-YYYY HH24:MI:SS'), " +
-                       "'Chưa xác nhận', ?, 'Ngày')";
+            // Bảng HOPDONG: MaHopDong, MaKH, NgayLapHopDong, TGNhanPhong, TGTraPhong,
+            // TinhTrangHD, LoaiKH, TriGiaHD, HinhThucThue
+            // -> Không có cột số người, chỉ lưu tiền + hình thức thuê
+            String sqlHopDong
+                    = "INSERT INTO HOPDONG (MaHopDong, MaKH, NgayLapHopDong, TGNhanPhong, TGTraPhong, TinhTrangHD, TriGiaHD, HinhThucThue) "
+                    + "VALUES (HopDong_Seq.NEXTVAL, ?, SYSTIMESTAMP, "
+                    + "TO_TIMESTAMP(?, 'DD-MM-YYYY HH24:MI:SS'), "
+                    + "TO_TIMESTAMP(?, 'DD-MM-YYYY HH24:MI:SS'), "
+                    + "'Chưa xác nhận', ?, 'Ngày')";
 
-               try (PreparedStatement psHopDong = con.prepareStatement(sqlHopDong, new String[]{"MAHOPDONG"})) {
-                   psHopDong.setInt(1, makh);
-                   psHopDong.setString(2, ngayNhan);
-                   psHopDong.setString(3, ngayTra);
-                   psHopDong.setLong(4, tien);
+            try (PreparedStatement psHopDong = con.prepareStatement(sqlHopDong, new String[]{"MAHOPDONG"})) {
+                psHopDong.setInt(1, makh);
+                psHopDong.setString(2, ngayNhan);
+                psHopDong.setString(3, ngayTra);
+                psHopDong.setLong(4, tien);
 
-                   int row = psHopDong.executeUpdate();
-                   if (row <= 0) {
-                       con.rollback();
-                       JOptionPane.showMessageDialog(null, "Không thể chèn hợp đồng.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                       return 0;
-                   }
+                int row = psHopDong.executeUpdate();
+                if (row <= 0) {
+                    con.rollback();
+                    JOptionPane.showMessageDialog(null, "Không thể chèn hợp đồng.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return 0;
+                }
 
-                   // Lấy MaHopDong vừa tạo
-                   int maHopDong = 0;
-                   try (ResultSet rs = psHopDong.getGeneratedKeys()) {
-                       if (rs.next()) {
-                           maHopDong = rs.getInt(1);
-                       }
-                   }
+                // Lấy MaHopDong vừa tạo
+                int maHopDong = 0;
+                try (ResultSet rs = psHopDong.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        maHopDong = rs.getInt(1);
+                    }
+                }
 
-                   if (maHopDong == 0) {
-                       con.rollback();
-                       JOptionPane.showMessageDialog(null, "Không thể lấy mã hợp đồng mới.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                       return 0;
-                   }
+                if (maHopDong == 0) {
+                    con.rollback();
+                    JOptionPane.showMessageDialog(null, "Không thể lấy mã hợp đồng mới.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return 0;
+                }
 
-                   int soKhach = soNL + soTE;
+                int soKhach = soNL + soTE;
 
-                   // Thêm chi tiết đặt phòng
-                   for (int maPhong : soPhongDatList) {
-                       int row1 = ThemCTDP(con, maHopDong, maPhong, soKhach);
-                       if (row1 <= 0) {
-                           con.rollback();
-                           JOptionPane.showMessageDialog(
-                                   null,
-                                   "Không thể thêm phòng " + maPhong + " vào hợp đồng " + maHopDong,
-                                   "Lỗi",
-                                   JOptionPane.ERROR_MESSAGE
-                           );
-                           return 0;
-                       }
-                       System.out.println("Thêm thành công phòng " + maPhong + " vào hợp đồng " + maHopDong);
-                   }
+                // Thêm chi tiết đặt phòng
+                for (int maPhong : soPhongDatList) {
+                    int row1 = ThemCTDP(con, maHopDong, maPhong, soKhach);
+                    if (row1 <= 0) {
+                        con.rollback();
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Không thể thêm phòng " + maPhong + " vào hợp đồng " + maHopDong,
+                                "Lỗi",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return 0;
+                    }
+                    System.out.println("Thêm thành công phòng " + maPhong + " vào hợp đồng " + maHopDong);
+                }
 
-                   con.commit();
-                   return 1;
-               }
+                con.commit();
+                return 1;
+            }
 
-           } catch (SQLException ex) {
-               if (con != null) {
-                   try {
-                       con.rollback();
-                   } catch (SQLException e) {
-                       e.printStackTrace();
-                   }
-               }
+        } catch (SQLException ex) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
 
-               JOptionPane.showMessageDialog(null, "Lỗi SQL: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-               ex.printStackTrace();
-               return 0;
-           } finally {
-               if (con != null) {
-                   try {
-                       con.close();
-                   } catch (SQLException e) {
-                       e.printStackTrace();
-                   }
-               }
-           }
+            JOptionPane.showMessageDialog(null, "Lỗi SQL: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+            return 0;
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public static int getMaHopDongMoiNhat() {
-           // Khai báo biến MaHopDong với giá trị mặc định
-           int maHopDong = 0;
+        // Khai báo biến MaHopDong với giá trị mặc định
+        int maHopDong = 0;
 
-           // Sử dụng try-with-resources để tự động quản lý tài nguyên
-           try (
-                   Connection con = JDBCUtil.getConnection(); PreparedStatement ps = con.prepareStatement("SELECT MAX(MAHOPDONG) FROM HOPDONG"); ResultSet rs = ps.executeQuery()) {
-               // Kiểm tra kết quả trả về từ truy vấn
-               if (rs.next()) {
-                   maHopDong = rs.getInt(1);
-               }
-           } catch (SQLException ex) {
-               ex.printStackTrace();
-           }
+        // Sử dụng try-with-resources để tự động quản lý tài nguyên
+        try (
+                Connection con = JDBCUtil.getConnection(); PreparedStatement ps = con.prepareStatement("SELECT MAX(MAHOPDONG) FROM HOPDONG"); ResultSet rs = ps.executeQuery()) {
+            // Kiểm tra kết quả trả về từ truy vấn
+            if (rs.next()) {
+                maHopDong = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 
-           // Trả về kết quả
-           return maHopDong;
+        // Trả về kết quả
+        return maHopDong;
     }
 
     // Lấy giá phòng của (một hoặc nhiều) nằm trong hợp đồng đó - thuê theo ngày
@@ -338,18 +334,18 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
         double tong = 0.0;
 
         // SQL lay cac tham so can dung
-        String sqlThamSo = "SELECT TenThamSo, GiaTri FROM THAMSO " +
-                           "WHERE TenThamSo IN ('SoLuongKhachToiDa', 'HeSoKhachNuocNgoai', 'PhuThuKhachThu3')";
+        String sqlThamSo = "SELECT TenThamSo, GiaTri FROM THAMSO "
+                + "WHERE TenThamSo IN ('SoLuongKhachToiDa', 'HeSoKhachNuocNgoai', 'PhuThuKhachThu3')";
 
         // SQL lay danh sach phong trong hop dong
         // FIX: gia khong con nam o PHONG.Gia ma nam o LOAIPHONG.Gia
-        String sqlChiTiet =
-            "SELECT LP.Gia AS Gia, CTDP.SoKhach, HD.LoaiKH " +
-            "FROM PHONG P " +
-            "JOIN LOAIPHONG LP ON P.MaLoai = LP.MaLoai " +
-            "JOIN CHITIETDATPHONG CTDP ON P.MaPhong = CTDP.MaPhong " +
-            "JOIN HOPDONG HD ON HD.MaHopDong = CTDP.MaHopDong " +
-            "WHERE HD.MaHopDong = ?";
+        String sqlChiTiet
+                = "SELECT LP.Gia AS Gia, CTDP.SoKhach, HD.LoaiKH "
+                + "FROM PHONG P "
+                + "JOIN LOAIPHONG LP ON P.MaLoai = LP.MaLoai "
+                + "JOIN CHITIETDATPHONG CTDP ON P.MaPhong = CTDP.MaPhong "
+                + "JOIN HOPDONG HD ON HD.MaHopDong = CTDP.MaHopDong "
+                + "WHERE HD.MaHopDong = ?";
 
         try (Connection con = JDBCUtil.getConnection()) {
 
@@ -358,8 +354,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
             double heSoKhachNuocNgoai = 1.0;  // default: khong tang
             double phuThuKhachThu3 = 0.0;     // default: khong phu thu
 
-            try (PreparedStatement psTS = con.prepareStatement(sqlThamSo);
-                 ResultSet rsTS = psTS.executeQuery()) {
+            try (PreparedStatement psTS = con.prepareStatement(sqlThamSo); ResultSet rsTS = psTS.executeQuery()) {
 
                 while (rsTS.next()) {
                     String ten = rsTS.getString("TenThamSo");
@@ -402,20 +397,19 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
 
                         // --- Phu thu neu vuot SoLuongKhachToiDa ---
                         if (soKhach >= soKhachToiDa) {
-                            int soKhachVuot = soKhach - soKhachToiDa;
+                            int soKhachVuot = 1;
                             double phuThuThemKhach = gia * phuThuKhachThu3 * soKhachVuot;
                             tienMotNgay += phuThuThemKhach;
+                            System.out.println("Số khách: " + soKhach);
                             System.out.println("Phu thu them khach: " + phuThuThemKhach);
                         }
 
-
-
                         double tienPhongTheoSoNgay = tienMotNgay * soNgayThue;
-                        if (loaiKH != null &&
-                            (loaiKH.equalsIgnoreCase("Nước ngoài") ||
-                             loaiKH.equalsIgnoreCase("Nuoc ngoai"))) {
+                        if (loaiKH != null
+                                && (loaiKH.equalsIgnoreCase("Nước ngoài")
+                                || loaiKH.equalsIgnoreCase("Nuoc ngoai"))) {
 
-                            tienPhongTheoSoNgay = tienPhongTheoSoNgay*1.5;
+                            tienPhongTheoSoNgay = tienPhongTheoSoNgay * 1.5;
                             System.out.println("Phu thu nuoc ngoai: ");
                         }
                         tong += tienPhongTheoSoNgay;
@@ -438,12 +432,6 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
         return tong;
     }
 
-
-
-
-
-
-
     // Cập nhật tình trạng hợp đồng sang đã thanh toán
     public static void capnhatTinhTrang(int mahd) {
         String sql = "UPDATE HOPDONG SET TinhTrangHD = 'Đã thanh toán' WHERE MaHopDong = ?";
@@ -457,134 +445,136 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
         }
     }
 
-   // Tinh tong gia phong thue theo gio (co phu thu)
-   public static Double tongGiaPhongGio(int maHD, long soGioThue) {
-       double tong = 0.0;
+    // Tinh tong gia phong thue theo gio (co phu thu)
+    public static Double tongGiaPhongGio(int maHD, long soGioThue) {
+        double tong = 0.0;
 
-       // SQL lay cac tham so
-       String sqlThamSo = "SELECT TenThamSo, GiaTri FROM THAMSO " +
-                          "WHERE TenThamSo IN ('SoLuongKhachToiDa', 'HeSoKhachNuocNgoai', 'PhuThuKhachThu3')";
+        // SQL lay cac tham so
+        String sqlThamSo = "SELECT TenThamSo, GiaTri FROM THAMSO "
+                + "WHERE TenThamSo IN ('SoLuongKhachToiDa', 'HeSoKhachNuocNgoai', 'PhuThuKhachThu3')";
 
-       // SQL lay danh sach phong trong hop dong
-       // FIX: gia tu LOAIPHONG.Gia
-       String sqlChiTiet =
-           "SELECT LP.Gia AS Gia, CTDP.SoKhach, HD.LoaiKH " +
-           "FROM PHONG P " +
-           "JOIN LOAIPHONG LP ON P.MaLoai = LP.MaLoai " +
-           "JOIN CHITIETDATPHONG CTDP ON P.MaPhong = CTDP.MaPhong " +
-           "JOIN HOPDONG HD ON HD.MaHopDong = CTDP.MaHopDong " +
-           "WHERE HD.MaHopDong = ?";
+        // SQL lay danh sach phong trong hop dong
+        // FIX: gia tu LOAIPHONG.Gia
+        String sqlChiTiet
+                = "SELECT LP.Gia AS Gia, CTDP.SoKhach, HD.LoaiKH "
+                + "FROM PHONG P "
+                + "JOIN LOAIPHONG LP ON P.MaLoai = LP.MaLoai "
+                + "JOIN CHITIETDATPHONG CTDP ON P.MaPhong = CTDP.MaPhong "
+                + "JOIN HOPDONG HD ON HD.MaHopDong = CTDP.MaHopDong "
+                + "WHERE HD.MaHopDong = ?";
 
-       try (Connection con = JDBCUtil.getConnection()) {
+        try (Connection con = JDBCUtil.getConnection()) {
 
-           // ====== LAY THAM SO ======
-           int soKhachToiDa = 3;             // default
-           double heSoKhachNuocNgoai = 1.0;  // default: khong tang
-           double phuThuKhachThu3 = 0.0;     // default
+            // ====== LAY THAM SO ======
+            int soKhachToiDa = 3;             // default
+            double heSoKhachNuocNgoai = 1.0;  // default: khong tang
+            double phuThuKhachThu3 = 0.0;     // default
 
-           try (PreparedStatement psTS = con.prepareStatement(sqlThamSo);
-                ResultSet rsTS = psTS.executeQuery()) {
+            try (PreparedStatement psTS = con.prepareStatement(sqlThamSo); ResultSet rsTS = psTS.executeQuery()) {
 
-               while (rsTS.next()) {
-                   String ten = rsTS.getString("TenThamSo");
-                   double giaTri = rsTS.getDouble("GiaTri");
+                while (rsTS.next()) {
+                    String ten = rsTS.getString("TenThamSo");
+                    double giaTri = rsTS.getDouble("GiaTri");
 
-                   switch (ten) {
-                       case "SoLuongKhachToiDa":
-                           soKhachToiDa = (int) giaTri;
-                           break;
-                       case "HeSoKhachNuocNgoai":
-                           heSoKhachNuocNgoai = giaTri;
-                           break;
-                       case "PhuThuKhachThu3":
-                           phuThuKhachThu3 = giaTri;
-                           break;
-                       default:
-                           break;
-                   }
-               }
+                    switch (ten) {
+                        case "SoLuongKhachToiDa":
+                            soKhachToiDa = (int) giaTri;
+                            break;
+                        case "HeSoKhachNuocNgoai":
+                            heSoKhachNuocNgoai = giaTri;
+                            break;
+                        case "PhuThuKhachThu3":
+                            phuThuKhachThu3 = giaTri;
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
-               System.out.println("Tham so: soKhachToiDa=" + soKhachToiDa
-                       + ", heSoKhachNuocNgoai=" + heSoKhachNuocNgoai
-                       + ", phuThuKhachThu3=" + phuThuKhachThu3);
-           }
+                System.out.println("Tham so: soKhachToiDa=" + soKhachToiDa
+                        + ", heSoKhachNuocNgoai=" + heSoKhachNuocNgoai
+                        + ", phuThuKhachThu3=" + phuThuKhachThu3);
+            }
 
-           // ====== LAY CHI TIET PHONG + TINH TIEN THEO GIO ======
-           try (PreparedStatement ps = con.prepareStatement(sqlChiTiet)) {
-               ps.setInt(1, maHD);
+            // ====== LAY CHI TIET PHONG + TINH TIEN THEO GIO ======
+            try (PreparedStatement ps = con.prepareStatement(sqlChiTiet)) {
+                ps.setInt(1, maHD);
 
-               try (ResultSet rs = ps.executeQuery()) {
-                   while (rs.next()) {
-                       double giaNgay = rs.getDouble("Gia");   // Gia ngay tu LOAIPHONG
-                       int soKhach = rs.getInt("SoKhach");
-                       String loaiKH = rs.getString("LoaiKH");
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        double giaNgay = rs.getDouble("Gia");   // Gia ngay tu LOAIPHONG
+                        int soKhach = rs.getInt("SoKhach");
+                        String loaiKH = rs.getString("LoaiKH");
 
-                       // Gia co ban 1 gio
-                       double giaMotGio = giaNgay / 22.0 * 1.5;
-                       double tienMotGio = giaMotGio;
+                        // Gia co ban 1 gio
+                        double giaMotGio = giaNgay / 22.0 * 1.5;
+                        double tienMotGio = giaMotGio;
 
-                       // --- Phu thu neu vuot so khach toi da ---
-                       if (soKhach >= soKhachToiDa) {
-                           int soKhachVuot = soKhach - soKhachToiDa;
-                           double phuThuThemKhach = giaMotGio * phuThuKhachThu3 * soKhachVuot;
-                           tienMotGio += phuThuThemKhach;
-                           System.out.println("Phu thu them khach (gio): " + phuThuThemKhach);
-                       }
+                        // --- Phu thu neu vuot so khach toi da ---
+                        if (soKhach >= soKhachToiDa) {
+                            int soKhachVuot = soKhach - soKhachToiDa;
+                            double phuThuThemKhach = giaMotGio * phuThuKhachThu3 * soKhachVuot;
+                            tienMotGio += phuThuThemKhach;
+                            System.out.println("Phu thu them khach (gio): " + phuThuThemKhach);
+                        }
 
-                       double tienPhongTheoGio = tienMotGio * soGioThue;
-                        if (loaiKH != null &&
-                            (loaiKH.equalsIgnoreCase("Nước ngoài") ||
-                             loaiKH.equalsIgnoreCase("Nuoc ngoai"))) {
+                        double tienPhongTheoGio = tienMotGio * soGioThue;
+                        if (loaiKH != null
+                                && (loaiKH.equalsIgnoreCase("Nước ngoài")
+                                || loaiKH.equalsIgnoreCase("Nuoc ngoai"))) {
 
-                            tienPhongTheoGio = tienPhongTheoGio*1.5;
+                            tienPhongTheoGio = tienPhongTheoGio * 1.5;
                             System.out.println("Phu thu nuoc ngoai: ");
                         }
-                       tong += tienPhongTheoGio;
+                        tong += tienPhongTheoGio;
 
-                       System.out.println("Gia ngay goc: " + giaNgay);
-                       System.out.println("Gia mot gio (chua phu thu): " + giaMotGio);
-                       System.out.println("So khach: " + soKhach);
-                       System.out.println("LoaiKH: " + loaiKH);
-                       System.out.println("Tien mot gio (da phu thu): " + tienMotGio);
-                       System.out.println("So gio thue: " + soGioThue);
-                       System.out.println("Tien phong cho phong nay: " + tienPhongTheoGio);
-                       System.out.println("Tong tam thoi: " + tong);
-                   }
-               }
-           }
+                        System.out.println("Gia ngay goc: " + giaNgay);
+                        System.out.println("Gia mot gio (chua phu thu): " + giaMotGio);
+                        System.out.println("So khach: " + soKhach);
+                        System.out.println("LoaiKH: " + loaiKH);
+                        System.out.println("Tien mot gio (da phu thu): " + tienMotGio);
+                        System.out.println("So gio thue: " + soGioThue);
+                        System.out.println("Tien phong cho phong nay: " + tienPhongTheoGio);
+                        System.out.println("Tong tam thoi: " + tong);
+                    }
+                }
+            }
 
-       } catch (SQLException ex) {
-           ex.printStackTrace();
-       }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 
-       return tong;
-   }
-
-
+        return tong;
+    }
 
     // Thêm hợp đồng thuê giờ (chưa gắn chi tiết phòng ở đây)
     public int ttunThemHopDong(int makh,
-                               String checkInDateTime,
-                               String checkOutDateTime,
-                               int soNL, int soTE) throws SQLException {
+            String checkInDateTime,
+            String checkOutDateTime,
+            String hinhThucThue,
+            String loaiKH,
+            long triGiaHD) throws SQLException {
 
         Connection con = null;
 
         try {
             con = JDBCUtil.getConnection();
 
-            String sql = "INSERT INTO HOPDONG (MaHopDong, MaKH, NgayLapHopDong, TGNhanPhong, TGTraPhong, TinhTrangHD, TriGiaHD, HinhThucThue) "
+            String sql = "INSERT INTO HOPDONG (MaHopDong, MaKH, NgayLapHopDong, "
+                    + "TGNhanPhong, TGTraPhong, TinhTrangHD, LoaiKH, TriGiaHD, HinhThucThue) "
                     + "VALUES (HopDong_Seq.NEXTVAL, ?, SYSTIMESTAMP, "
                     + "TO_TIMESTAMP(?, 'DD-MM-YYYY HH24:MI:SS'), "
                     + "TO_TIMESTAMP(?, 'DD-MM-YYYY HH24:MI:SS'), "
-                    + "'Đã xác nhận', 0, 'Giờ')";
+                    + "'Đã xác nhận', ?, ?, ?)";
 
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setInt(1, makh);
                 ps.setString(2, checkInDateTime);
                 ps.setString(3, checkOutDateTime);
+                ps.setString(4, loaiKH);
+                ps.setLong(5, triGiaHD);
+                ps.setString(6, hinhThucThue);
 
-                // soNL, soTE hiện chưa có cột để lưu trong HOPDONG
                 return ps.executeUpdate();
             }
         } catch (SQLException ex) {
@@ -601,6 +591,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
             }
         }
     }
+
     public static long tinhThoiGian(String checkInDateTime, String checkOutDateTime) {
         // Định dạng cho ngày giờ
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
@@ -690,8 +681,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
                 + "WHERE c.MAPHONG = ? "
                 + "ORDER BY h.TGTRAPHONG DESC ";
 
-        try (Connection con = JDBCUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = JDBCUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, sophong);
             try (ResultSet rs = ps.executeQuery()) {
@@ -727,8 +717,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
                 + "WHERE k.CCCD = ? "
                 + "ORDER BY h.TGNHANPHONG DESC ";
 
-        try (Connection con = JDBCUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = JDBCUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, CCCD);
             try (ResultSet rs = ps.executeQuery()) {
@@ -768,9 +757,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
                 + "GROUP BY EXTRACT(MONTH FROM h.TGNHANPHONG), EXTRACT(YEAR FROM h.TGNHANPHONG) "
                 + "ORDER BY EXTRACT(YEAR FROM h.TGNHANPHONG), EXTRACT(MONTH FROM h.TGNHANPHONG)";
 
-        try (Connection con = JDBCUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection con = JDBCUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Vector<Object> row = new Vector<>();
@@ -796,9 +783,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
                 + "GROUP BY H.HINHTHUCTHUE, EXTRACT(MONTH FROM H.NGAYLAPHOPDONG), EXTRACT(YEAR FROM H.NGAYLAPHOPDONG) "
                 + "ORDER BY EXTRACT(YEAR FROM H.NGAYLAPHOPDONG), EXTRACT(MONTH FROM H.NGAYLAPHOPDONG)";
 
-        try (Connection con = JDBCUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection con = JDBCUtil.getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Vector<Object> row = new Vector<>();
@@ -814,4 +799,50 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
 
         return DS_HTThue;
     }
+
+    public static long tinhTienCoc(ArrayList<Integer> soPhongDatList, long tongPhutThue) throws SQLException {
+
+        final double TY_LE_COC = 0.3;
+        final long PHUT_NGAY_DAU = 22 * 60; // 1320 phút
+        final long PHUT_NGAY_CHUAN = 24 * 60; // 1440 phút
+
+        //  Thuê theo giờ → không cọc
+        if (tongPhutThue < PHUT_NGAY_DAU) {
+            return 0;
+        }
+
+        // Tính số ngày thuê
+        long soNgayThue = 1; // đã đủ ngày đầu
+
+        long phutConLai = tongPhutThue - PHUT_NGAY_DAU;
+        if (phutConLai > 0) {
+            soNgayThue += phutConLai / PHUT_NGAY_CHUAN;
+        }
+
+        long tongTien = 0;
+
+        String sql = """
+            SELECT lp.Gia
+            FROM PHONG p
+            JOIN LOAIPHONG lp ON p.MaLoai = lp.MaLoai
+            WHERE p.MaPhong = ?
+        """;
+
+        try (Connection conn = JDBCUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (Integer maPhong : soPhongDatList) {
+                ps.setInt(1, maPhong);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        long giaPhong = rs.getLong("Gia");
+                        tongTien += giaPhong * soNgayThue;
+                    }
+                }
+            }
+        }
+
+        return Math.round(tongTien * TY_LE_COC);
+    }
+
 }
