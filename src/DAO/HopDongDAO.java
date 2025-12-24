@@ -402,7 +402,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
 
                         // --- Phu thu neu vuot SoLuongKhachToiDa ---
                         if (soKhach >= soKhachToiDa) {
-                            int soKhachVuot = soKhach - soKhachToiDa;
+                            int soKhachVuot = 1;
                             double phuThuThemKhach = gia * phuThuKhachThu3 * soKhachVuot;
                             tienMotNgay += phuThuThemKhach;
                             System.out.println("Phu thu them khach: " + phuThuThemKhach);
@@ -525,7 +525,7 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
 
                        // --- Phu thu neu vuot so khach toi da ---
                        if (soKhach >= soKhachToiDa) {
-                           int soKhachVuot = soKhach - soKhachToiDa;
+                           int soKhachVuot = 1;
                            double phuThuThemKhach = giaMotGio * phuThuKhachThu3 * soKhachVuot;
                            tienMotGio += phuThuThemKhach;
                            System.out.println("Phu thu them khach (gio): " + phuThuThemKhach);
