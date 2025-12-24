@@ -679,27 +679,16 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
-                              <Component id="jLabel3" min="-2" pref="160" max="-2" attributes="0"/>
-                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="sua_tinhTrangHDjComboBox" alignment="0" min="-2" pref="190" max="-2" attributes="0"/>
                                   <Component id="gioiTinhjLabel" alignment="0" min="-2" pref="144" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="sua_slNguoiLonjTextField" max="32767" attributes="0"/>
-                                  <Component id="hoTenjLable" pref="191" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace pref="30" max="32767" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="sua_slTreEmjTextField" max="32767" attributes="0"/>
-                                  <Component id="CCCDjLabel" pref="190" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
+                              <EmptySpace pref="475" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -716,23 +705,12 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel3" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="60" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="gioiTinhjLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="hoTenjLable" alignment="3" min="-2" pref="15" max="-2" attributes="0"/>
-                          <Component id="CCCDjLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="gioiTinhjLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="sua_tinhTrangHDjComboBox" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
-                          <Component id="sua_slNguoiLonjTextField" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
-                          <Component id="sua_slTreEmjTextField" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace pref="312" max="32767" attributes="0"/>
+                      <Component id="sua_tinhTrangHDjComboBox" min="-2" pref="40" max="-2" attributes="0"/>
+                      <EmptySpace pref="313" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="sua_huyjButton" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
                           <Component id="sua_luujButton" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
@@ -755,14 +733,6 @@
                   <Color blue="44" green="18" red="18" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="H&#x1ee2;P &#x110;&#x1ed2;NG"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JLabel" name="jLabel3">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Segoe UI" size="14" style="0"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Nh&#x1ead;p th&#xf4;ng tin c&#x1ea7;n s&#x1eed;a"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="gioiTinhjLabel">
@@ -790,11 +760,6 @@
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JTextField" name="sua_slNguoiLonjTextField">
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sua_slNguoiLonjTextFieldActionPerformed"/>
-              </Events>
-            </Component>
             <Component class="javax.swing.JButton" name="sua_huyjButton">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -811,24 +776,6 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sua_huyjButtonActionPerformed"/>
               </Events>
-            </Component>
-            <Component class="javax.swing.JTextField" name="sua_slTreEmjTextField">
-            </Component>
-            <Component class="javax.swing.JLabel" name="hoTenjLable">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Segoe UI" size="14" style="0"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="S&#x1ed1; l&#x1b0;&#x1ee3;ng ng&#x1b0;&#x1edd;i l&#x1edb;n"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JLabel" name="CCCDjLabel">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Segoe UI" size="14" style="0"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="S&#x1ed1; l&#x1b0;&#x1ee3;ng tr&#x1ebb; em"/>
-              </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="sua_luujButton">
               <Properties>
