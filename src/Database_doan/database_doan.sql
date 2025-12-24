@@ -738,8 +738,6 @@ INSERT INTO THAMSO (TenThamSo, GiaTri) VALUES ('HeSoKhachNuocNgoai', 1.5);
 INSERT INTO THAMSO (TenThamSo, GiaTri) VALUES ('PhuThuKhachThu3', 0.25);
 INSERT INTO THAMSO (TenThamSo, GiaTri) VALUES ('PhanTramCoc', 0.3);
 
-DESC HOPDONG;
-
 
 COMMIT;
 --======================================== TRIGGER ======================================
@@ -783,9 +781,6 @@ BEGIN
   END IF;
 END;
 /
-
-
-
 
 
 
