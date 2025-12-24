@@ -519,7 +519,7 @@ public class HopDongDAO {
                            System.out.println("Phu thu them khach (gio): " + phuThuThemKhach);
                        }
 
-                       double tienPhongTheoGio = tienMotGio * soGioThue;
+                        double tienPhongTheoGio = tienMotGio * soGioThue;
                         if (loaiKH != null &&
                             (loaiKH.equalsIgnoreCase("Nước ngoài") ||
                              loaiKH.equalsIgnoreCase("Nuoc ngoai"))) {
@@ -528,14 +528,6 @@ public class HopDongDAO {
                             System.out.println("Phu thu nuoc ngoai: ");
                         }
 
-                        double tienPhongTheoGio = tienMotGio * soGioThue;
-                        if (loaiKH != null
-                                && (loaiKH.equalsIgnoreCase("Nước ngoài")
-                                || loaiKH.equalsIgnoreCase("Nuoc ngoai"))) {
-
-                            tienPhongTheoGio = tienPhongTheoGio * 1.5;
-                            System.out.println("Phu thu nuoc ngoai: ");
-                        }
                         tong += tienPhongTheoGio;
 
                         System.out.println("Gia ngay goc: " + giaNgay);
