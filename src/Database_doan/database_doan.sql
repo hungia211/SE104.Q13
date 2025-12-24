@@ -73,7 +73,7 @@ CREATE TABLE LOAIPHONG (
 CREATE TABLE PHONG  (
   MaPhong NUMBER PRIMARY KEY,
   MaLoai NUMBER,
-  TinhTrang NVARCHAR2(10) --  'Bình thường', 'Bảo trì',
+  TinhTrang NVARCHAR2(20) --  'Bình thường', 'Bảo trì',
 );
 
 -- Tạo bảng chi tiết đặt phòng
@@ -315,18 +315,17 @@ VALUES (NhanVien_Seq.NEXTVAL, 'Bùi Thị Lan', '567840123456', 'Nữ', TO_DATE(
 -- Hợp đồng cho Nguyễn Văn An (2 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 1,
-TO_TIMESTAMP('10-01-2023 09:15:23','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('12-01-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('15-01-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('10-11-2025 09:15:23','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('12-11-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('15-11-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1000000, 'Ngày');
 
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 1,
-TO_TIMESTAMP('15-03-2023 14:23:45','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('17-03-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('20-03-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('20-02-2025 14:23:45','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('22-02-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('25-02-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 2000000, 'Ngày');
-
 
 -- Hợp đồng cho Trần Thị Bình (1 hợp đồng)
 INSERT INTO HOPDONG
@@ -334,109 +333,109 @@ INSERT INTO HOPDONG
  TinhTrangHD, LoaiKH, TriGiaHD, HinhThucThue)
 VALUES
 (HopDong_Seq.NEXTVAL, 2,
-TO_TIMESTAMP('01-02-2023 08:45:12','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('03-02-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('06-02-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('01-02-2025 08:45:12','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('03-02-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('06-02-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1500000, 'Ngày');
 
 -- Hợp đồng cho Lê Mạnh Cường (1 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 3,
-TO_TIMESTAMP('05-04-2023 10:32:55','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('07-04-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('10-04-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('05-04-2025 10:32:55','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('07-04-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('10-04-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1800000, 'Ngày');
 
 -- Hợp đồng cho Phạm Thị Diệu (1 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 4,
-TO_TIMESTAMP('15-05-2023 13:05:44','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('17-05-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('20-05-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('15-05-2025 13:05:44','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('17-05-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('20-05-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1600000, 'Ngày');
 
 -- Hợp đồng cho Hoàng Văn Huy (2 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 5,
-TO_TIMESTAMP('01-06-2023 11:25:30','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('03-06-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('06-06-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('01-06-2025 11:25:30','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('03-06-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('06-06-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 2200000, 'Ngày');
 
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 5,
-TO_TIMESTAMP('10-07-2023 09:45:50','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('12-07-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('15-07-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('10-07-2025 09:45:50','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('12-07-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('15-07-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 2300000, 'Ngày');
 
 -- Hợp đồng cho Vũ Thị Linh (1 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 6,
-TO_TIMESTAMP('20-08-2023 14:55:22','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('22-08-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('25-08-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('20-08-2025 14:55:22','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('22-08-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('25-08-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1300000, 'Ngày');
 
 -- Hợp đồng cho Đặng Văn Lâm (1 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 7,
-TO_TIMESTAMP('05-09-2023 08:40:10','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('07-09-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('10-09-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('05-09-2025 08:40:10','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('07-09-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('10-09-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 2500000, 'Ngày');
 
 -- Hợp đồng cho Bùi Thị Hiền (1 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 8,
-TO_TIMESTAMP('12-10-2023 12:22:33','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('14-10-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('17-10-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('12-10-2025 12:22:33','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('14-10-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('17-10-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 2400000, 'Ngày');
 
 -- Hợp đồng cho Ngô Trần Văn Trung (3 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 9,
-TO_TIMESTAMP('01-11-2023 09:12:01','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('03-11-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('06-11-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('01-11-2025 09:12:01','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('03-11-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('06-11-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1700000, 'Ngày');
 
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 9,
-TO_TIMESTAMP('10-12-2023 13:35:12','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('12-12-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('15-12-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('10-12-2025 13:35:12','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('12-12-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('15-12-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1600000, 'Ngày');
 
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 9,
-TO_TIMESTAMP('20-12-2023 10:50:30','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('22-12-2023 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('25-12-2023 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('20-12-2025 10:50:30','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('22-12-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('25-12-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 3000000, 'Ngày');
 
 -- Hợp đồng cho Đỗ Nguyễn Ngọc Nữ (2 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 10,
-TO_TIMESTAMP('12-01-2024 12:22:33','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('14-01-2024 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('17-01-2024 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('12-01-2025 12:22:33','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('14-01-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('17-01-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1900000, 'Ngày');
 
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 10,
-TO_TIMESTAMP('12-03-2024 19:05:54','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('16-03-2024 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('20-03-2024 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('12-03-2025 19:05:54','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('16-03-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('20-03-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 2900000, 'Ngày');
 
 -- Hợp đồng cho Nguyễn Thị Thu (1 hợp đồng)
 INSERT INTO HOPDONG VALUES
 (HopDong_Seq.NEXTVAL, 11,
-TO_TIMESTAMP('28-01-2024 12:22:33','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('04-02-2024 14:00:00','DD-MM-YYYY HH24:MI:SS'),
-TO_TIMESTAMP('07-02-2024 12:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('28-01-2025 12:22:33','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('04-02-2025 14:00:00','DD-MM-YYYY HH24:MI:SS'),
+TO_TIMESTAMP('07-02-2025 12:00:00','DD-MM-YYYY HH24:MI:SS'),
 'Đã thanh toán', 'Nội địa', 1900000, 'Ngày');
 
 
@@ -608,91 +607,91 @@ INSERT INTO TRANGBI (MaTB, TenTB, GiaTB, SoLuong, SLHong) VALUES (TrangBi_Seq.NE
 
 -- Thêm dữ liệu vào bảng KHUYENMAI sử dụng sequence
 INSERT INTO KHUYENMAI (MaKM, TenKM, MoTaKM, NgayBatDau, NgayKetThuc, PhanTramKM) VALUES
-(KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi mùa hè', 'Giảm giá 10% cho tất cả các phòng trong tháng 6 và 7', TO_DATE('01-06-2024', 'DD-MM-YYYY'), TO_DATE('31-07-2024', 'DD-MM-YYYY'), 0.1);
+(KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi mùa hè', 'Giảm giá 10% cho tất cả các phòng trong tháng 6 và 7', TO_DATE('01-06-2025', 'DD-MM-YYYY'), TO_DATE('31-07-2025', 'DD-MM-YYYY'), 0.1);
 
 INSERT INTO KHUYENMAI (MaKM, TenKM, MoTaKM, NgayBatDau, NgayKetThuc, PhanTramKM) VALUES
-(KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi cuối tuần', 'Giảm giá 5% cho các ngày cuối tuần từ thứ 6 đến chủ nhật', TO_DATE('01-01-2024', 'DD-MM-YYYY'), TO_DATE('31-12-2024', 'DD-MM-YYYY'), 0.05);
+(KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi cuối tuần', 'Giảm giá 5% cho các ngày cuối tuần từ thứ 6 đến chủ nhật', TO_DATE('01-01-2025', 'DD-MM-YYYY'), TO_DATE('31-12-2025', 'DD-MM-YYYY'), 0.05);
 
 INSERT INTO KHUYENMAI (MaKM, TenKM, MoTaKM, NgayBatDau, NgayKetThuc, PhanTramKM) VALUES
-(KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi sinh nhật', 'Giảm giá 15% trong ngày sinh nhật của khách hàng', TO_DATE('01-01-2024', 'DD-MM-YYYY'), TO_DATE('31-12-2024', 'DD-MM-YYYY'), 0.15);
+(KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi sinh nhật', 'Giảm giá 15% trong ngày sinh nhật của khách hàng', TO_DATE('01-01-2025', 'DD-MM-YYYY'), TO_DATE('31-12-2025', 'DD-MM-YYYY'), 0.15);
 
 INSERT INTO KHUYENMAI (MaKM, TenKM, MoTaKM, NgayBatDau, NgayKetThuc, PhanTramKM) VALUES
-(KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi mùa đông', 'Giảm giá 10% cho tất cả các phòng trong tháng 12 và 1', TO_DATE('01-12-2024', 'DD-MM-YYYY'), TO_DATE('31-01-2025', 'DD-MM-YYYY'), 0.1);
+(KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi mùa đông', 'Giảm giá 10% cho tất cả các phòng trong tháng 12 và 1', TO_DATE('01-12-2025', 'DD-MM-YYYY'), TO_DATE('31-01-2025', 'DD-MM-YYYY'), 0.1);
 
 -- Khuyến mãi cho Ngày Quốc tế Phụ nữ (8/3)
 INSERT INTO KHUYENMAI (MaKM, TenKM, MoTaKM, NgayBatDau, NgayKetThuc, PhanTramKM) VALUES
 (KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi Ngày Phụ nữ 8/3', 'Chúc mừng Ngày Quốc tế Phụ nữ! Chương trình khuyến mãi dành riêng cho phái đẹp với ưu đãi giảm giá 20% cho tất cả các phụ nữ lưu trú trong ngày 8/3.',
-TO_DATE('08-03-2024', 'DD-MM-YYYY'), TO_DATE('08-03-2024', 'DD-MM-YYYY'), 0.2);
+TO_DATE('08-03-2025', 'DD-MM-YYYY'), TO_DATE('08-03-2025', 'DD-MM-YYYY'), 0.2);
 
 -- Khuyến mãi cho Ngày Quốc tế thiếu nhi (1/6)
 INSERT INTO KHUYENMAI (MaKM, TenKM, MoTaKM, NgayBatDau, NgayKetThuc, PhanTramKM) VALUES
 (KhuyenMai_Seq.NEXTVAL, 'Khuyến mãi Ngày Lao động 1/6', 'Chúc mừng Ngày Quốc tế Thiếu nhi! Chương trình khuyến mãi đặc biệt dành cho tất cả các khách hàng với ưu đãi giảm giá 15% trong cả tuần từ 1/6 đến 7/6.',
-TO_DATE('01-06-2024', 'DD-MM-YYYY'), TO_DATE('07-06-2024', 'DD-MM-YYYY'), 0.15);
+TO_DATE('01-06-2025', 'DD-MM-YYYY'), TO_DATE('07-06-2025', 'DD-MM-YYYY'), 0.15);
 
 
 
 -- Hóa đơn cho hợp đồng của Nguyễn Văn An (Hợp đồng số 1)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 1, TO_DATE('15-01-2023', 'DD-MM-YYYY'), 3000000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 1, TO_DATE('15-01-2025', 'DD-MM-YYYY'), 3000000, 0);
 
 -- Hóa đơn cho hợp đồng của Nguyễn Văn An (Hợp đồng số 2)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 2, TO_DATE('20-03-2023', 'DD-MM-YYYY'), 6000000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 2, TO_DATE('20-03-2025', 'DD-MM-YYYY'), 6000000, 0);
 
 -- Hóa đơn cho hợp đồng của Trần Thị Bình
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 3, TO_DATE('06-02-2023', 'DD-MM-YYYY'), 4500000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 3, TO_DATE('06-02-2025', 'DD-MM-YYYY'), 4500000, 0);
 
 -- Hóa đơn cho hợp đồng của Lê Mạnh Cường
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 4, TO_DATE('10-04-2023', 'DD-MM-YYYY'), 5800000, 200000);
+(HoaDon_Seq.NEXTVAL, NULL, 4, TO_DATE('10-04-2025', 'DD-MM-YYYY'), 5800000, 200000);
 
 -- Hóa đơn cho hợp đồng của Phạm Thị Diệu
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 5, TO_DATE('20-05-2023', 'DD-MM-YYYY'), 3600000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 5, TO_DATE('20-05-2025', 'DD-MM-YYYY'), 3600000, 0);
 
 -- Hóa đơn cho hợp đồng của Hoàng Văn Huy (Hợp đồng số 1)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 6, TO_DATE('06-06-2023', 'DD-MM-YYYY'), 6200000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 6, TO_DATE('06-06-2025', 'DD-MM-YYYY'), 6200000, 0);
 
 -- Hóa đơn cho hợp đồng của Hoàng Văn Huy (Hợp đồng số 2)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 7, TO_DATE('15-07-2023', 'DD-MM-YYYY'), 6300000, 50000);
+(HoaDon_Seq.NEXTVAL, NULL, 7, TO_DATE('15-07-2025', 'DD-MM-YYYY'), 6300000, 50000);
 
 -- Hóa đơn cho hợp đồng của Vũ Thị Linh
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 8, TO_DATE('25-08-2023', 'DD-MM-YYYY'), 3300000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 8, TO_DATE('25-08-2025', 'DD-MM-YYYY'), 3300000, 0);
 
 -- Hóa đơn cho hợp đồng của Đặng Văn Lâm
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 9, TO_DATE('10-09-2023', 'DD-MM-YYYY'), 6500000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 9, TO_DATE('10-09-2025', 'DD-MM-YYYY'), 6500000, 0);
 
 -- Hóa đơn cho hợp đồng của Bùi Thị Hiền
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 10, TO_DATE('17-10-2023', 'DD-MM-YYYY'), 6400000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 10, TO_DATE('17-10-2025', 'DD-MM-YYYY'), 6400000, 0);
 
 -- Hóa đơn cho hợp đồng của Ngô Trần Văn Trung (Hợp đồng số 1)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 11, TO_DATE('06-11-2023', 'DD-MM-YYYY'), 4700000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 11, TO_DATE('06-11-2025', 'DD-MM-YYYY'), 4700000, 0);
 
 -- Hóa đơn cho hợp đồng của Ngô Trần Văn Trung (Hợp đồng số 2)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 12, TO_DATE('15-12-2023', 'DD-MM-YYYY'), 4600000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 12, TO_DATE('15-12-2025', 'DD-MM-YYYY'), 4600000, 0);
 
 -- Hóa đơn cho hợp đồng của Ngô Trần Văn Trung (Hợp đồng số 3)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 13, TO_DATE('25-12-2023', 'DD-MM-YYYY'), 9000000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 13, TO_DATE('25-12-2025', 'DD-MM-YYYY'), 9000000, 0);
 
 -- Hóa đơn cho hợp đồng của Đỗ Nguyễn Ngọc Nữ (Hợp đồng số 1)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 14, TO_DATE('17-01-2024', 'DD-MM-YYYY'), 5900000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 14, TO_DATE('17-01-2025', 'DD-MM-YYYY'), 5900000, 0);
 
 -- Hóa đơn cho hợp đồng của Đỗ Nguyễn Ngọc Nữ (Hợp đồng số 2)
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 15, TO_DATE('20-03-2024', 'DD-MM-YYYY'), 4300000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 15, TO_DATE('20-03-2025', 'DD-MM-YYYY'), 4300000, 0);
 
 INSERT INTO HOADON (MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB) VALUES
-(HoaDon_Seq.NEXTVAL, NULL, 16, TO_DATE('12-02-2024', 'DD-MM-YYYY'), 4300000, 0);
+(HoaDon_Seq.NEXTVAL, NULL, 16, TO_DATE('12-02-2025', 'DD-MM-YYYY'), 4300000, 0);
 
 
 -- insert dữ liệu bảng hỏng trang bị

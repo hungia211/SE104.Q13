@@ -1676,8 +1676,6 @@ public class PhongFrame extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(rootPane, "Nhập đầy đủ thông tin các thời gian đặt phòng", "Thông báo", JOptionPane.ERROR_MESSAGE);
         }
-
-
     }//GEN-LAST:event_traCuujButton1ActionPerformed
 
     private void datPhongjButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_datPhongjButton2ActionPerformed
@@ -1844,12 +1842,13 @@ public class PhongFrame extends javax.swing.JFrame {
         String loaiKH = rNuocngoai.isSelected() ? "Nước ngoài" : "Nội địa";
 
         long tienCoc = HopDongDAO.tinhTienCoc(soPhongDatList, tongPhut);
-
+        
         HopDongDAO hdDAO = new HopDongDAO();
         int row = hdDAO.ttunThemHopDong(
             maKHCu,
             checkInDateTime,
             checkOutDateTime,
+            "Đã xác nhận",
             hinhThucThue,
             loaiKH,
             tienCoc

@@ -66,59 +66,100 @@ public class ChiTietDatPhongDAO {
         return ps.executeUpdate();
     }
     
-    public static ArrayList<Vector> getCTDP(int maHopDong){
-        // Tạo cái ArrayList lưu danh sách khách hàng
-        ArrayList<Vector> DS_CTDP = new ArrayList<>();
-        
+    public static ArrayList<Vector> getCTDP(int maHopDong) {
         ArrayList<Vector> cthdList = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = JDBCUtil.getConnection();
-            String sql = "SELECT PHONG.MaPhong, PHONG.Gia, HOPDONG.HinhThucThue, HOPDONG.TGNhanPhong, HOPDONG.TGTraPhong "
-                    + "FROM HOPDONG "
-                    + "JOIN CHITIETDATPHONG ON HOPDONG.MaHopDong = CHITIETDATPHONG.MaHopDong "
-                    + "JOIN PHONG ON CHITIETDATPHONG.MaPhong = PHONG.MaPhong "
-                    + "WHERE HOPDONG.MaHopDong = ?";
-            ps = con.prepareStatement(sql);
+
+        String sql = """
+            SELECT 
+                P.MaPhong,
+                C.SoKhach,
+                L.Gia AS GIA,
+                H.HinhThucThue,
+                H.TGNhanPhong,
+                H.TGTraPhong
+            FROM HOPDONG H
+            JOIN CHITIETDATPHONG C ON H.MaHopDong = C.MaHopDong
+            JOIN PHONG P ON C.MaPhong = P.MaPhong
+            JOIN LOAIPHONG L ON P.MaLoai = L.MaLoai
+            WHERE H.MaHopDong = ?
+        """;
+
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, maHopDong);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Vector cthd = new Vector<>();
-                HopDongModel hopdong = HopDongDAO.getHDtheoMaHopDong(maHopDong);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-                String ngayden = hopdong.getTGNhanPhong().format(formatter);
-                String ngaydi = hopdong.getTGTraPhong().format(formatter);
-                long sogio = tinhThoiGian(ngayden, ngaydi) / 60;
-                long songay = tinhKhoangCach2Ngay(ngayden, ngaydi);
-                System.out.println(songay);
-                double tongTienThue = 0;
-                if ("Ngày".equals(rs.getString("HinhThucThue"))) {
-                    tongTienThue = songay * rs.getDouble("Gia"); // Thuê theo ngày
-                } else if ("Giờ".equals(rs.getString("HinhThucThue"))) {
-                    tongTienThue = (sogio / 22.0) * rs.getDouble("Gia") * 1.5; // Thuê theo giờ
+
+            // Lấy hợp đồng 1 lần
+            HopDongModel hopdong = HopDongDAO.getHDtheoMaHopDong(maHopDong);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String ngayden = hopdong.getTGNhanPhong().format(formatter);
+            String ngaydi  = hopdong.getTGTraPhong().format(formatter);
+
+            long sogio = tinhThoiGian(ngayden, ngaydi) / 60;
+
+            // Tính số ngày chuẩn (không dùng LocalDate.parse với format có giờ)
+            long songay = tinhSoNgayTuDateTime(ngayden, ngaydi);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Vector cthd = new Vector();
+
+                    double gia = rs.getDouble("GIA");
+                    String hinhThuc = rs.getString("HinhThucThue");
+
+                    double tongTienThue = 0;
+                    if ("Ngày".equalsIgnoreCase(hinhThuc)) {
+                        tongTienThue = songay * gia;
+                    } else if ("Giờ".equalsIgnoreCase(hinhThuc)) {
+                        tongTienThue = (sogio / 22.0) * gia * 1.5;
+                    }
+
+                    // tiền cọc 30%
+                    tongTienThue = tongTienThue * 30 / 100.0;
+                    String formattedTongTienThue = String.format("%,.0f VND", tongTienThue);
+
+                    cthd.add(rs.getInt("MaPhong"));
+                    cthd.add(rs.getInt("SoKhach"));    
+                    cthd.add(hinhThuc);
+
+                    // TIMESTAMP -> lấy LocalDate để format
+                    java.sql.Timestamp tsNhan = rs.getTimestamp("TGNhanPhong");
+                    java.sql.Timestamp tsTra  = rs.getTimestamp("TGTraPhong");
+
+                    String formattedDatenp = (tsNhan != null)
+                            ? tsNhan.toLocalDateTime().toLocalDate().format(dateFormatter)
+                            : null;
+
+                    String formattedDatetp = (tsTra != null)
+                            ? tsTra.toLocalDateTime().toLocalDate().format(dateFormatter)
+                            : null;
+
+                    cthd.add(formattedDatenp);
+                    cthd.add(formattedDatetp);
+                    cthd.add(formattedTongTienThue);
+
+                    cthdList.add(cthd);
                 }
-                tongTienThue = tongTienThue * 30 /100;
-                String formattedTongTienThue = String.format("%,.0f VND", tongTienThue);
-                cthd.add(rs.getInt("MaPhong"));
-                cthd.add(rs.getString("HinhThucThue"));
-                java.sql.Date ngaynp = rs.getDate("TGNhanPhong");
-                String formattedDatenp = (ngaynp != null) ? ngaynp.toLocalDate().format(dateFormatter) : null;
-                java.sql.Date ngaytp = rs.getDate("TGTraPhong");
-                String formattedDatetp = (ngaytp != null) ? ngaytp.toLocalDate().format(dateFormatter) : null;
-                cthd.add(formattedDatenp);
-                cthd.add(formattedDatetp);
-                cthd.add(formattedTongTienThue);
-                cthdList.add(cthd);
             }
-            con.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return cthdList;
     }
+
+    // Tính số ngày từ 2 chuỗi datetime (dd-MM-yyyy HH:mm:ss)
+    private static long tinhSoNgayTuDateTime(String startDateTime, String endDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        LocalDateTime start = LocalDateTime.parse(startDateTime, formatter);
+        LocalDateTime end   = LocalDateTime.parse(endDateTime, formatter);
+
+        // lấy chênh lệch theo ngày dựa trên LocalDate
+        return ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate());
+    }
+
     
     public static long tinhThoiGian(String checkInDateTime, String checkOutDateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
