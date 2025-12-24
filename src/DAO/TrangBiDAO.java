@@ -201,10 +201,10 @@ public class TrangBiDAO {
     }
 
     // Thêm vào bảng HONGTRANGBI
-    public static void themHONGTRANGBI(ArrayList<Vector> tbh, int maHD) {
+    public static void themHONGTRANGBI(ArrayList<Vector<Integer>> tbh, int maHD) {
         try (Connection con = JDBCUtil.getConnection(); PreparedStatement ps = con.prepareStatement("INSERT INTO HONGTRANGBI VALUES (?, ?)")) {
-            for (Vector trangBi : tbh) {
-                int maTB = (int) trangBi.get(0); // Lấy mã trang bị từ Vector
+            for (Vector<Integer> trangBi : tbh) {
+                int maTB = trangBi.get(0); // Lấy mã trang bị từ Vector
                 ps.setInt(1, maTB);
                 ps.setInt(2, maHD);
                 ps.addBatch();
@@ -216,11 +216,11 @@ public class TrangBiDAO {
     }
 
     // Cập nhật số lượng hỏng nếu có
-    public static void suaTBHong(ArrayList<Vector> tbh) {
+    public static void suaTBHong(ArrayList<Vector<Integer>> tbh) {
         try (Connection con = JDBCUtil.getConnection()) {
-            for (Vector tb : tbh) {
-                int maTB = (int) tb.get(0);
-                int soLuongHong = (int) tb.get(1);
+            for (Vector<Integer> tb : tbh) {
+                int maTB = tb.get(0);
+                int soLuongHong = tb.get(1);
 
                 // Tìm trang bị dựa trên mã trang bị
                 TrangBiModel trangbi = getTrangBi_MaTB(maTB);
@@ -228,7 +228,7 @@ public class TrangBiDAO {
                 // Nếu tìm thấy trang bị, cập nhật số lượng hỏng
                 if (trangbi != null) {
                     trangbi.setSoLuongHong(soLuongHong);
-                    trangbi.setSoLuong(trangbi.getSoLuong() - (int) tb.get(1));
+                    trangbi.setSoLuong(trangbi.getSoLuong() - tb.get(1));
                     // Cập nhật vào cơ sở dữ liệu
                     suaTrangBi(trangbi);
                 }

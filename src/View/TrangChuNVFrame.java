@@ -1,14 +1,36 @@
 package View;
 
+import DAO.ThongKeDAO;
 import DAO.TrangChuDAO;
 import DAO.excelDAO;
 import Model.NhanVienModel;
+import Model.ThongKeModel;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Locale;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 public class TrangChuNVFrame extends javax.swing.JFrame {
 
     private static NhanVienModel currentUser;
+    private DefaultTableModel thongKeTableModel;
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
+    private javax.swing.JComboBox<Integer> thongKeThangComboBox;
+    private javax.swing.JComboBox<Integer> thongKeNamComboBox;
+    private javax.swing.JLabel tongDoanhThuLabel;
+    private javax.swing.JButton thongKeTaiDuLieuButton;
+    private javax.swing.JPanel thongKePanel;
+    private javax.swing.JScrollPane thongKeScrollPane;
+    private javax.swing.JTable thongKeTable;
 
     public TrangChuNVFrame() {
         initComponents();
@@ -16,6 +38,7 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
         addSVG();
         FlatIntelliJLaf.registerCustomDefaultsSource("style");
         FlatIntelliJLaf.setup();
+        khoiTaoThongKe();
     }
 
     @SuppressWarnings("unchecked")
@@ -70,7 +93,7 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
         jLabel8.setBackground(new java.awt.Color(255, 255, 255));
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(24, 24, 68));
-        jLabel8.setText("TRANG NỘI BỘ KHÁCH SẠN");
+        jLabel8.setText("THỐNG KÊ DOANH THU");
 
         MenuPanel.setBackground(new java.awt.Color(24, 24, 68));
         MenuPanel.setPreferredSize(new java.awt.Dimension(200, 600));
@@ -400,6 +423,83 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
             }
         });
 
+        thongKePanel = new javax.swing.JPanel();
+        thongKePanel.setBackground(new java.awt.Color(255, 255, 255));
+        thongKePanel.setBorder(BorderFactory.createLineBorder(new java.awt.Color(220, 220, 220)));
+        thongKePanel.setLayout(new BorderLayout(0, 10));
+
+        javax.swing.JPanel thongKeTopPanel = new javax.swing.JPanel();
+        thongKeTopPanel.setBackground(new java.awt.Color(255, 255, 255));
+        thongKeTopPanel.setLayout(new BoxLayout(thongKeTopPanel, BoxLayout.Y_AXIS));
+
+        javax.swing.JPanel thongKeFilterPanel = new javax.swing.JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
+        thongKeFilterPanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.JLabel thongKeThangLabel = new javax.swing.JLabel();
+        thongKeThangLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        thongKeThangLabel.setText("Tháng:");
+
+        thongKeThangComboBox = new javax.swing.JComboBox<>();
+        thongKeThangComboBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        javax.swing.JLabel thongKeNamLabel = new javax.swing.JLabel();
+        thongKeNamLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        thongKeNamLabel.setText("Năm:");
+
+        thongKeNamComboBox = new javax.swing.JComboBox<>();
+        thongKeNamComboBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        thongKeTaiDuLieuButton = new javax.swing.JButton();
+        thongKeTaiDuLieuButton.setBackground(new java.awt.Color(24, 24, 68));
+        thongKeTaiDuLieuButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        thongKeTaiDuLieuButton.setForeground(new java.awt.Color(255, 255, 255));
+        thongKeTaiDuLieuButton.setText("Tải dữ liệu");
+
+        thongKeFilterPanel.add(thongKeThangLabel);
+        thongKeFilterPanel.add(thongKeThangComboBox);
+        thongKeFilterPanel.add(thongKeNamLabel);
+        thongKeFilterPanel.add(thongKeNamComboBox);
+        thongKeFilterPanel.add(thongKeTaiDuLieuButton);
+
+        javax.swing.JPanel thongKeSummaryPanel = new javax.swing.JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
+        thongKeSummaryPanel.setBackground(new java.awt.Color(255, 255, 255));
+        thongKeSummaryPanel.setBorder(BorderFactory.createLineBorder(new java.awt.Color(230, 230, 230)));
+
+        javax.swing.JLabel tongLabel = new javax.swing.JLabel();
+        tongLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        tongLabel.setText("Tổng doanh thu:");
+
+        tongDoanhThuLabel = new javax.swing.JLabel();
+        tongDoanhThuLabel.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        tongDoanhThuLabel.setForeground(new java.awt.Color(0, 102, 204));
+        tongDoanhThuLabel.setText("0");
+
+        thongKeSummaryPanel.add(tongLabel);
+        thongKeSummaryPanel.add(tongDoanhThuLabel);
+
+        thongKeTopPanel.add(thongKeFilterPanel);
+        thongKeTopPanel.add(thongKeSummaryPanel);
+
+        thongKeTableModel = new DefaultTableModel(
+            new Object [][] {},
+            new String [] {
+                "Mã loại", "Loại phòng", "Doanh thu"
+            }
+        ) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        thongKeTable = new JTable(thongKeTableModel);
+        thongKeScrollPane = new JScrollPane(thongKeTable);
+
+        thongKePanel.add(thongKeTopPanel, BorderLayout.NORTH);
+        thongKePanel.add(thongKeScrollPane, BorderLayout.CENTER);
+        javax.swing.JPanel thongKeExportPanel = new javax.swing.JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 6));
+        thongKeExportPanel.setBackground(new java.awt.Color(255, 255, 255));
+        thongKeExportPanel.add(doanhThuThangjButton);
+        thongKePanel.add(thongKeExportPanel, BorderLayout.SOUTH);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -413,20 +513,8 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
                         .addGap(145, 145, 145))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(37, 37, 37)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(36, 36, 36)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(34, 34, 34)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(72, 72, 72)
-                        .addComponent(soKHtrongThangjButton)
-                        .addGap(113, 113, 113)
-                        .addComponent(soHopDongjButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(doanhThuThangjButton)
-                        .addGap(55, 55, 55))))
+                        .addComponent(thongKePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -434,16 +522,8 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                 .addGap(36, 36, 36)
                 .addComponent(jLabel8)
-                .addGap(38, 38, 38)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(soKHtrongThangjButton)
-                    .addComponent(soHopDongjButton)
-                    .addComponent(doanhThuThangjButton))
+                .addGap(22, 22, 22)
+                .addComponent(thongKePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -451,6 +531,77 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void khoiTaoThongKe() {
+        loadNamThongKe();
+        loadThangThongKe();
+        taiDuLieuThongKe();
+        thongKeNamComboBox.addActionListener(evt -> loadThangThongKe());
+        thongKeTaiDuLieuButton.addActionListener(evt -> taiDuLieuThongKe());
+    }
+
+    private void loadNamThongKe() {
+        thongKeNamComboBox.removeAllItems();
+        ArrayList<Integer> dsNam = ThongKeDAO.getNamThongKe();
+        if (dsNam.isEmpty()) {
+            thongKeNamComboBox.addItem(LocalDate.now().getYear());
+            return;
+        }
+        for (Integer nam : dsNam) {
+            thongKeNamComboBox.addItem(nam);
+        }
+        int currentYear = LocalDate.now().getYear();
+        if (dsNam.contains(currentYear)) {
+            thongKeNamComboBox.setSelectedItem(currentYear);
+        }
+    }
+
+    private void loadThangThongKe() {
+        thongKeThangComboBox.removeAllItems();
+        Integer nam = (Integer) thongKeNamComboBox.getSelectedItem();
+        ArrayList<Integer> dsThang = new ArrayList<>();
+        if (nam != null) {
+            dsThang = ThongKeDAO.getThangThongKe(nam);
+        }
+        if (dsThang.isEmpty()) {
+            for (int i = 1; i <= 12; i++) {
+                thongKeThangComboBox.addItem(i);
+            }
+            thongKeThangComboBox.setSelectedItem(LocalDate.now().getMonthValue());
+            return;
+        }
+        for (Integer thang : dsThang) {
+            thongKeThangComboBox.addItem(thang);
+        }
+        int currentMonth = LocalDate.now().getMonthValue();
+        if (dsThang.contains(currentMonth)) {
+            thongKeThangComboBox.setSelectedItem(currentMonth);
+        }
+    }
+
+    private void taiDuLieuThongKe() {
+        Integer thang = (Integer) thongKeThangComboBox.getSelectedItem();
+        Integer nam = (Integer) thongKeNamComboBox.getSelectedItem();
+        if (thang == null || nam == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn tháng và năm.", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        ArrayList<ThongKeModel> ds = ThongKeDAO.getThongKeByThangNam(thang, nam);
+        thongKeTableModel.setRowCount(0);
+        for (ThongKeModel tk : ds) {
+            thongKeTableModel.addRow(new Object[]{
+                tk.getMaLoai(),
+                tk.getTenLoai(),
+                currencyFormat.format(tk.getDoanhThu())
+            });
+        }
+        double tongDoanhThu = ThongKeDAO.getTongDoanhThu(thang, nam);
+        tongDoanhThuLabel.setText(currencyFormat.format(tongDoanhThu));
+        if (ds.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có dữ liệu thống kê cho tháng/năm đã chọn.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
 public void addSVG() {
         svgLogo.setSVGImage("Image/logo.svg", 110, 110);
         svgPhong.setSVGImage("Image/phong.svg", 30, 30);
