@@ -553,6 +553,7 @@ public class HopDongDAO {
     public int ttunThemHopDong(int makh,
             String checkInDateTime,
             String checkOutDateTime,
+            String tinhTrangHD,
             String hinhThucThue,
             String loaiKH,
             long triGiaHD) throws SQLException {
@@ -567,15 +568,16 @@ public class HopDongDAO {
                     + "VALUES (HopDong_Seq.NEXTVAL, ?, SYSTIMESTAMP, "
                     + "TO_TIMESTAMP(?, 'DD-MM-YYYY HH24:MI:SS'), "
                     + "TO_TIMESTAMP(?, 'DD-MM-YYYY HH24:MI:SS'), "
-                    + "'Đã xác nhận', ?, ?, ?)";
+                    + "?, ?, ?, ?)";
 
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setInt(1, makh);
                 ps.setString(2, checkInDateTime);
                 ps.setString(3, checkOutDateTime);
-                ps.setString(4, loaiKH);
-                ps.setLong(5, triGiaHD);
-                ps.setString(6, hinhThucThue);
+                ps.setString(4, tinhTrangHD);
+                ps.setString(5, loaiKH);
+                ps.setLong(6, triGiaHD);
+                ps.setString(7, hinhThucThue);
 
                 return ps.executeUpdate();
             }
