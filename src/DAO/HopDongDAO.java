@@ -445,85 +445,86 @@ public class HopDongDAO {
         }
     }
 
-    // Tinh tong gia phong thue theo gio (co phu thu)
-    public static Double tongGiaPhongGio(int maHD, long soGioThue) {
-        double tong = 0.0;
+   // Tinh tong gia phong thue theo gio (co phu thu)
+   public static Double tongGiaPhongGio(int maHD, long soGioThue) {
+       double tong = 0.0;
 
-        // SQL lay cac tham so
-        String sqlThamSo = "SELECT TenThamSo, GiaTri FROM THAMSO "
-                + "WHERE TenThamSo IN ('SoLuongKhachToiDa', 'HeSoKhachNuocNgoai', 'PhuThuKhachThu3')";
+       // SQL lay cac tham so
+       String sqlThamSo = "SELECT TenThamSo, GiaTri FROM THAMSO " +
+                          "WHERE TenThamSo IN ('SoLuongKhachToiDa', 'HeSoKhachNuocNgoai', 'PhuThuKhachThu3')";
 
-        // SQL lay danh sach phong trong hop dong
-        // FIX: gia tu LOAIPHONG.Gia
-        String sqlChiTiet
-                = "SELECT LP.Gia AS Gia, CTDP.SoKhach, HD.LoaiKH "
-                + "FROM PHONG P "
-                + "JOIN LOAIPHONG LP ON P.MaLoai = LP.MaLoai "
-                + "JOIN CHITIETDATPHONG CTDP ON P.MaPhong = CTDP.MaPhong "
-                + "JOIN HOPDONG HD ON HD.MaHopDong = CTDP.MaHopDong "
-                + "WHERE HD.MaHopDong = ?";
+       // SQL lay danh sach phong trong hop dong
+       // FIX: gia tu LOAIPHONG.Gia
+       String sqlChiTiet =
+           "SELECT LP.Gia AS Gia, CTDP.SoKhach, HD.LoaiKH " +
+           "FROM PHONG P " +
+           "JOIN LOAIPHONG LP ON P.MaLoai = LP.MaLoai " +
+           "JOIN CHITIETDATPHONG CTDP ON P.MaPhong = CTDP.MaPhong " +
+           "JOIN HOPDONG HD ON HD.MaHopDong = CTDP.MaHopDong " +
+           "WHERE HD.MaHopDong = ?";
 
-        try (Connection con = JDBCUtil.getConnection()) {
+       try (Connection con = JDBCUtil.getConnection()) {
 
-            // ====== LAY THAM SO ======
-            int soKhachToiDa = 3;             // default
-            double heSoKhachNuocNgoai = 1.0;  // default: khong tang
-            double phuThuKhachThu3 = 0.0;     // default
+           // ====== LAY THAM SO ======
+           int soKhachToiDa = 3;             // default
+           double heSoKhachNuocNgoai = 1.0;  // default: khong tang
+           double phuThuKhachThu3 = 0.0;     // default
 
-            try (PreparedStatement psTS = con.prepareStatement(sqlThamSo); ResultSet rsTS = psTS.executeQuery()) {
+           try (PreparedStatement psTS = con.prepareStatement(sqlThamSo);
+                ResultSet rsTS = psTS.executeQuery()) {
 
-                while (rsTS.next()) {
-                    String ten = rsTS.getString("TenThamSo");
-                    double giaTri = rsTS.getDouble("GiaTri");
+               while (rsTS.next()) {
+                   String ten = rsTS.getString("TenThamSo");
+                   double giaTri = rsTS.getDouble("GiaTri");
 
-                    switch (ten) {
-                        case "SoLuongKhachToiDa":
-                            soKhachToiDa = (int) giaTri;
-                            break;
-                        case "HeSoKhachNuocNgoai":
-                            heSoKhachNuocNgoai = giaTri;
-                            break;
-                        case "PhuThuKhachThu3":
-                            phuThuKhachThu3 = giaTri;
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                   switch (ten) {
+                       case "SoLuongKhachToiDa":
+                           soKhachToiDa = (int) giaTri;
+                           break;
+                       case "HeSoKhachNuocNgoai":
+                           heSoKhachNuocNgoai = giaTri;
+                           break;
+                       case "PhuThuKhachThu3":
+                           phuThuKhachThu3 = giaTri;
+                           break;
+                       default:
+                           break;
+                   }
+               }
 
-                System.out.println("Tham so: soKhachToiDa=" + soKhachToiDa
-                        + ", heSoKhachNuocNgoai=" + heSoKhachNuocNgoai
-                        + ", phuThuKhachThu3=" + phuThuKhachThu3);
-            }
+               System.out.println("Tham so: soKhachToiDa=" + soKhachToiDa
+                       + ", heSoKhachNuocNgoai=" + heSoKhachNuocNgoai
+                       + ", phuThuKhachThu3=" + phuThuKhachThu3);
+           }
 
-            // ====== LAY CHI TIET PHONG + TINH TIEN THEO GIO ======
-            try (PreparedStatement ps = con.prepareStatement(sqlChiTiet)) {
-                ps.setInt(1, maHD);
+           // ====== LAY CHI TIET PHONG + TINH TIEN THEO GIO ======
+           try (PreparedStatement ps = con.prepareStatement(sqlChiTiet)) {
+               ps.setInt(1, maHD);
 
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        double giaNgay = rs.getDouble("Gia");   // Gia ngay tu LOAIPHONG
-                        int soKhach = rs.getInt("SoKhach");
-                        String loaiKH = rs.getString("LoaiKH");
+               try (ResultSet rs = ps.executeQuery()) {
+                   while (rs.next()) {
+                       double giaNgay = rs.getDouble("Gia");   // Gia ngay tu LOAIPHONG
+                       int soKhach = rs.getInt("SoKhach");
+                       String loaiKH = rs.getString("LoaiKH");
 
-                        // Gia co ban 1 gio
-                        double giaMotGio = giaNgay / 22.0 * 1.5;
-                        double tienMotGio = giaMotGio;
+                       // Gia co ban 1 gio
+                       double giaMotGio = giaNgay / 22.0 * 1.5;
+                       double tienMotGio = giaMotGio;
 
-                        // --- Phu thu neu vuot so khach toi da ---
-                        if (soKhach >= soKhachToiDa) {
-                            int soKhachVuot = soKhach - soKhachToiDa;
-                            double phuThuThemKhach = giaMotGio * phuThuKhachThu3 * soKhachVuot;
-                            tienMotGio += phuThuThemKhach;
-                            System.out.println("Phu thu them khach (gio): " + phuThuThemKhach);
-                        }
+                       // --- Phu thu neu vuot so khach toi da ---
+                       if (soKhach >= soKhachToiDa) {
+                           int soKhachVuot = 1;
+                           double phuThuThemKhach = giaMotGio * phuThuKhachThu3 * soKhachVuot;
+                           tienMotGio += phuThuThemKhach;
+                           System.out.println("Phu thu them khach (gio): " + phuThuThemKhach);
+                       }
 
                         double tienPhongTheoGio = tienMotGio * soGioThue;
-                        if (loaiKH != null
-                                && (loaiKH.equalsIgnoreCase("Nước ngoài")
-                                || loaiKH.equalsIgnoreCase("Nuoc ngoai"))) {
+                        if (loaiKH != null &&
+                            (loaiKH.equalsIgnoreCase("Nước ngoài") ||
+                             loaiKH.equalsIgnoreCase("Nuoc ngoai"))) {
 
-                            tienPhongTheoGio = tienPhongTheoGio * 1.5;
+                            tienPhongTheoGio = tienPhongTheoGio*1.5;
                             System.out.println("Phu thu nuoc ngoai: ");
                         }
 
