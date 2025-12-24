@@ -72,18 +72,19 @@ import javax.swing.SwingUtilities;
 
 public class HopDongFrame extends javax.swing.JFrame {
 
-    ArrayList<Vector> tinhtoan = new ArrayList<>();
+    ArrayList<Vector<Integer>> tinhtoan = new ArrayList<>();
     Vector<Double> tien = new Vector<>();
     int tongsl = 0;
     double tong = 0.0;
     double thanhtienfinal;
     double tiengocfinal;
     double tongtienfinal;
+    double tiengiamfinal;
     int maHopDongfinal;
 
     DecimalFormat df = new DecimalFormat("#");
     // Tạo NumberFormat với Local cho Việt Nam
-    NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+    NumberFormat numberFormat = NumberFormat.getInstance(Locale.forLanguageTag("vi-VN"));
     int maHopDongTinh;
     String ngayden;
     String ngaydi;
@@ -150,8 +151,8 @@ public class HopDongFrame extends javax.swing.JFrame {
         defaultTableModel.addColumn("Thời Gian Nhận Phòng");
         defaultTableModel.addColumn("Thời Gian Trả Phòng");
         defaultTableModel.addColumn("Tình Trạng HĐ");
-        defaultTableModel.addColumn("Trị Giá HĐ");
-        defaultTableModel.addColumn("Hình thức thuê");
+        defaultTableModel.addColumn("Tiền cọc");
+        defaultTableModel.addColumn("Ngày/Giờ");
 
         tableHopDong.setModel(defaultTableModel);
     }
@@ -168,6 +169,7 @@ public class HopDongFrame extends javax.swing.JFrame {
             defaultTableModel.addRow(new Object[]{
                 hopDong.getMaHopDong(), hopDong.getMaKH(), hopDong.getNgayLapHopDong(),
                 hopDong.getTGNhanPhong(), hopDong.getTGTraPhong(), hopDong.getTinhTrangHD(),
+                numberFormat.format(hopDong.getTriGiaHopDong()),
                 hopDong.getHinhThucThue()
             });
         }
@@ -204,6 +206,8 @@ public class HopDongFrame extends javax.swing.JFrame {
             defaultTableModel.addRow(new Object[]{
                 hopDong.getMaHopDong(), hopDong.getMaKH(), hopDong.getNgayLapHopDong(),
                 hopDong.getTGNhanPhong(), hopDong.getTGTraPhong(), hopDong.getTinhTrangHD(),
+                numberFormat.format(hopDong.getTriGiaHopDong()),
+                hopDong.getHinhThucThue()
             });
         }
 
@@ -246,6 +250,8 @@ public class HopDongFrame extends javax.swing.JFrame {
             defaultTableModel.addRow(new Object[]{
                 hopDong.getMaHopDong(), hopDong.getMaKH(), hopDong.getNgayLapHopDong(),
                 hopDong.getTGNhanPhong(), hopDong.getTGTraPhong(), hopDong.getTinhTrangHD(),
+                numberFormat.format(hopDong.getTriGiaHopDong()),
+                hopDong.getHinhThucThue()
             });
         }
 
@@ -285,6 +291,8 @@ public class HopDongFrame extends javax.swing.JFrame {
             defaultTableModel.addRow(new Object[]{
                 hopDong.getMaHopDong(), hopDong.getMaKH(), hopDong.getNgayLapHopDong(),
                 hopDong.getTGNhanPhong(), hopDong.getTGTraPhong(), hopDong.getTinhTrangHD(),
+                numberFormat.format(hopDong.getTriGiaHopDong()),
+                hopDong.getHinhThucThue()
             });
         }
 
@@ -381,7 +389,7 @@ public class HopDongFrame extends javax.swing.JFrame {
     }
 
     public void themTrangBiHong() {
-        Vector v = new Vector();
+        Vector<Integer> v = new Vector<>();
         v.add(Integer.parseInt(matbDV.getText()));
         v.add(Integer.parseInt(slDV.getValue().toString()));
         tinhtoan.add(v);
@@ -410,7 +418,7 @@ public class HopDongFrame extends javax.swing.JFrame {
     public void resetVector() {
         tien.clear();
 
-        for (Vector<Double> vector : tinhtoan) {
+        for (Vector<Integer> vector : tinhtoan) {
             vector.clear();
         }
     }
@@ -441,6 +449,8 @@ public class HopDongFrame extends javax.swing.JFrame {
         int row = tableHopDong.getSelectedRow();
 
         if (row != -1) {
+            tien.clear();
+            tiengiamfinal = 0.0;
             int maKH = Integer.parseInt(tableHopDong.getValueAt(row, 1).toString());
             try {
                 // Tên KH
@@ -494,7 +504,15 @@ public class HopDongFrame extends javax.swing.JFrame {
                 tien.add(tongtien);
                 tt.setText("Tổng tiền phải thanh toán: " + numberFormat.format(tongtien));
                 tiendv.setText("Tiền dịch vụ: " + numberFormat.format(tong));
+                double thanhTien = tongtien + tong;
+                this.thanhtienfinal = thanhTien;
+                tiengiam.setText("Tiền giảm: 0");
+                this.tiengiamfinal = 0.0;
+                thanhtien.setText("Thành tiền: " + numberFormat.format(thanhTien));
                 setMaKM(hang);
+                if (kmComboBox.getItemCount() > 0) {
+                    kmComboBox.setSelectedIndex(0);
+                }
                 chonMaKM(tiengoc, tongtien);
                 
 
@@ -506,9 +524,10 @@ public class HopDongFrame extends javax.swing.JFrame {
 
     public void setMaKM(String hang) {
         ArrayList<KhuyenMaiModel> kml = KhuyenMaiDAO.getDSKhuyenMaitheoNgay(ngayden, ngaydi);
-
-        LocalDate currentDate = LocalDate.now();
-
+        for (ActionListener al : kmComboBox.getActionListeners()) {
+            kmComboBox.removeActionListener(al);
+        }
+        kmComboBox.removeAllItems();
         kmComboBox.addItem("");
 
         for (KhuyenMaiModel km : kml) {
@@ -536,15 +555,19 @@ public class HopDongFrame extends javax.swing.JFrame {
         kmComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!("".equals(kmComboBox.getSelectedItem()))) {
-                    double giam = KhuyenMaiDAO.getGiamGia_MaKM(Integer.parseInt((String) kmComboBox.getSelectedItem()));
-                    double tg = tiengoc * giam;
-                    double tt = tongtien - tg;
-                    
-                    
-                    tiengiam.setText("Tiền giảm: -" + numberFormat.format(tg));
-                    thanhtien.setText("Thành tiền: " + numberFormat.format(tt));
+                String maKM = (String) kmComboBox.getSelectedItem();
+                double tg = 0;
+                if (maKM != null && !maKM.isEmpty()) {
+                    double giam = KhuyenMaiDAO.getGiamGia_MaKM(Integer.parseInt(maKM));
+                    tg = tiengoc * giam;
                 }
+                double tt = tongtien + tong - tg;
+                if (tg > 0) {
+                    tiengiam.setText("Tiền giảm: -" + numberFormat.format(tg));
+                } else {
+                    tiengiam.setText("Tiền giảm: 0");
+                }
+                thanhtien.setText("Thành tiền: " + numberFormat.format(tt));
             }
         });
         
@@ -594,14 +617,10 @@ public class HopDongFrame extends javax.swing.JFrame {
         }
         int maHD = HoaDonDAO.getMaxRow() + 1;
 
-        double tiengoc = tien.get(0);
-        double tg = Double.parseDouble(tiengiam.getText().substring(11));
-        //double tongtien = tiengoc - Double.parseDouble(tableHopDong.getValueAt(row, 8).toString()) - tg;
-        double tongtien = tien.get(1);
-        String tongStr = tiendv.getText().substring(14).replace(".", "");
-        double dichvu = Double.parseDouble(tongStr);
-
-        double thanhtien = dichvu + tongtien - tg;
+        double tongtien = tongtienfinal;
+        double dichvu = tong;
+        double tg = tiengiamfinal;
+        double thanhtien = thanhtienfinal;
 
         System.out.println(tableHopDong.getValueAt(row, 3).toString());
 
@@ -647,7 +666,7 @@ public class HopDongFrame extends javax.swing.JFrame {
                 + "<hr>"
                 + "<table>"
                 + "<tr><td class='left'>Tổng tiền:</td><td class='right'>" + numberFormat.format(tongtien) + " VND" + "</td></tr>"
-                + "<tr><td class='left'>Mã khuyến mãi: " + (String) kmComboBox.getSelectedItem() + "</td><td class='right'>" + tg + "</td></tr>"
+                + "<tr><td class='left'>Mã khuyến mãi: " + (String) kmComboBox.getSelectedItem() + "</td><td class='right'>" + (tg > 0 ? ("-" + numberFormat.format(tg)) : "0") + "</td></tr>"
                 + "<tr><td class='left'>Tiền dịch vụ:</td><td class='right'>" + numberFormat.format(dichvu) + " VND" + "</td></tr>"
                 + "<tr><td class='left bold'>Thành tiền:</td><td class='right'>" + numberFormat.format(thanhtien) + " VND" + "</td></tr>"
                 + "</table>"
@@ -1120,11 +1139,11 @@ public class HopDongFrame extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Mã Hợp Đồng", "Mã KH", "Ngày Lập Hợp Đồng", "Thời Gian Nhận Phòng", "Thời Gian Trả Phòng", "Tình Trạng HĐ", "Trị Giá HĐ", "Hinh thức thuê"
+                "Mã Hợp Đồng", "Mã KH", "Ngày Lập Hợp Đồng", "Thời Gian Nhận Phòng", "Thời Gian Trả Phòng", "Tình Trạng HĐ", "Tiền cọc", "Ngày/Giờ"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.Object.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -1964,17 +1983,21 @@ public class HopDongFrame extends javax.swing.JFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         int row = tableHopDong.getSelectedRow();
 
-        String tongStr = tiendv.getText().substring(14).replace(".", "");
-        double dichvu = Double.parseDouble(tongStr);
+        double dichvu = tong;
         int maNV = currentUser.getMaNV();
         
         
-        double giam = KhuyenMaiDAO.getGiamGia_MaKM(Integer.parseInt((String) kmComboBox.getSelectedItem()));
+        String maKMStr = (String) kmComboBox.getSelectedItem();
+        double giam = 0;
+        if (maKMStr != null && !maKMStr.isEmpty()) {
+            giam = KhuyenMaiDAO.getGiamGia_MaKM(Integer.parseInt(maKMStr));
+        }
         System.out.println("giam tien: " + giam);
         double tg = tiengocfinal * giam;
         System.out.println("tien giam: " + tg);
-        double thanhtien = tongtienfinal - tg;
+        double thanhtien = tongtienfinal + dichvu - tg;
         this.thanhtienfinal = thanhtien;
+        this.tiengiamfinal = tg;
         System.out.println("thanh tien: " + thanhtien);
         
         
@@ -1983,7 +2006,7 @@ public class HopDongFrame extends javax.swing.JFrame {
         System.out.println(thanhtienfinal);
 
         int maHD = Integer.parseInt(tableHopDong.getValueAt(row, 0).toString());
-        if ("".equals(kmComboBox.getSelectedItem().toString())) {
+        if (maKMStr == null || maKMStr.isEmpty()) {
             if (HoaDonDAO.themHoaDonKhongMaKM(maHopDongTinh, thanhtien, dichvu, maNV)) {
                 JOptionPane.showMessageDialog(null, "Thanh toán thành công");
                 HopDongDAO.capnhatTinhTrang(maHD);
@@ -1994,7 +2017,7 @@ public class HopDongFrame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Thanh toán thất bại");
             }
         } else {
-            int maKM = Integer.parseInt(kmComboBox.getSelectedItem().toString());
+            int maKM = Integer.parseInt(maKMStr);
 
             if (HoaDonDAO.themHoaDon(maKM, maHD, thanhtien, dichvu, maNV)) {
                 JOptionPane.showMessageDialog(null, "Thanh toán thành công");
