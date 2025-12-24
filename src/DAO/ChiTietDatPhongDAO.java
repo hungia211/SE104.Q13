@@ -17,35 +17,35 @@ import java.util.Vector;
 
 public class ChiTietDatPhongDAO {
 
-    public static int ThemCTDP(int maHopDong, int maPhong) throws SQLException {
+    public static int ThemCTDP(int maHopDong, int maPhong, int soKhach) throws SQLException {
         Connection con = null;
 
         try {
-            // Tạo kết nối đến cơ sở dữ liệu
             con = JDBCUtil.getConnection();
 
-            // Thực thi câu lệnh SQL
-            String sql = "INSERT INTO CHITIETDATPHONG (MAHOPDONG, MAPHONG) VALUES (?, ?)";
+            String sql =
+                "INSERT INTO CHITIETDATPHONG (MAHOPDONG, MAPHONG, SOKHACH) " +
+                "VALUES (?, ?, ?)";
 
-            // Tạo đối tượng PreparedStatement
+
             PreparedStatement ps = con.prepareStatement(sql);
-
-            // Thiết lập các tham số cho câu lệnh SQL
             ps.setInt(1, maHopDong);
             ps.setInt(2, maPhong);
+            ps.setInt(3, soKhach);
 
-            // Thực thi câu lệnh SQL
             return ps.executeUpdate();
+
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Lỗi kết nối cơ sở dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                null,
+                "Lỗi thêm chi tiết đặt phòng: " + ex.getMessage(),
+                "Lỗi",
+                JOptionPane.ERROR_MESSAGE
+            );
             return 0;
         } finally {
             if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                con.close();
             }
         }
     }
