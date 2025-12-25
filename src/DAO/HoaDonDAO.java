@@ -259,6 +259,10 @@ public class HoaDonDAO {
                     } else if ("Giờ".equalsIgnoreCase(hinhThuc)) {
                         tongTienThue = (soGio / 22.0) * giaPhong * 1.5;
                     }
+                    
+                    if (soKhach >= 3){
+                        tongTienThue = tongTienThue * 1.25;
+                    }
 
                     String formattedNhan = nhan.toLocalDate().format(dateFormatter);
                     String formattedTra  = tra.toLocalDate().format(dateFormatter);
