@@ -242,22 +242,12 @@ public class HoaDonDAO {
                 } else if ("Giờ".equals(rs.getString("HinhThucThue"))) {
                     tongTienThue = (sogio / 22.0) * rs.getDouble("Gia") * 1.5; // Thuê theo giờ
                 }
-                String formattedTongTienThue = String.format("%,.0f VND", tongTienThue);
-                cthd.add(rs.getInt("MaPhong"));
-                cthd.add(rs.getString("HinhThucThue"));
-                java.sql.Date ngaynp = rs.getDate("TGNhanPhong");
-                String formattedDatenp = (ngaynp != null) ? ngaynp.toLocalDate().format(dateFormatter) : null;
-                java.sql.Date ngaytp = rs.getDate("TGTraPhong");
-                String formattedDatetp = (ngaytp != null) ? ngaytp.toLocalDate().format(dateFormatter) : null;
-                cthd.add(formattedDatenp);
-                cthd.add(formattedDatetp);
-                cthd.add(formattedTongTienThue);
-                cthdList.add(cthd);
             }
-            con.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return cthdList;
     }
 
@@ -340,33 +330,50 @@ public class HoaDonDAO {
         return row;
     }
 
-    public static boolean themHoaDon(int maKM, int maHopDong, double tongtien, double dichvu, int maNV) {
-        String sqlInsertHoaDon = "INSERT INTO HOADON VALUES (HoaDon_Seq.NEXTVAL, ?, ?, ?, ?, ?)";
-        String sqlInsertTaoHoaDon = "INSERT INTO TAOHOADON (MaHD, MaNV) VALUES (?, ?)";
+    public static boolean themHoaDon(
+            int maKM,
+            int maHopDong,
+            double tongTien,
+            double tienHongTB,
+            int maNV
+    ) {
+        String sqlInsertHoaDon
+                = "INSERT INTO HOADON ("
+                + "MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB"
+                + ") VALUES (HoaDon_Seq.NEXTVAL, ?, ?, ?, ?, ?)";
 
-        try (Connection con = JDBCUtil.getConnection(); PreparedStatement psHoaDon = con.prepareStatement(sqlInsertHoaDon, new String[]{"MaHD"}); PreparedStatement psTaoHoaDon = con.prepareStatement(sqlInsertTaoHoaDon)) {
+        String sqlInsertTaoHoaDon
+                = "INSERT INTO TAOHOADON (MaHD, MaNV) VALUES (?, ?)";
 
-            con.setAutoCommit(false); // Bắt đầu giao dịch
+        try (Connection con = JDBCUtil.getConnection()) {
 
-            LocalDate currentDate = LocalDate.now();
-            psHoaDon.setInt(1, maKM);
-            psHoaDon.setInt(2, maHopDong);
-            psHoaDon.setDate(3, java.sql.Date.valueOf(currentDate));
-            psHoaDon.setDouble(4, tongtien);
-            psHoaDon.setDouble(5, dichvu);
-            psHoaDon.executeUpdate();
+            con.setAutoCommit(false); 
 
-            // Lấy mã hóa đơn vừa được tạo
-            try (ResultSet rs = psHoaDon.getGeneratedKeys()) {
-                if (rs.next()) {
+            try (
+                    PreparedStatement psHoaDon
+                    = con.prepareStatement(sqlInsertHoaDon, new String[]{"MaHD"}); PreparedStatement psTaoHoaDon
+                    = con.prepareStatement(sqlInsertTaoHoaDon)) {
+
+                psHoaDon.setInt(1, maKM);
+                psHoaDon.setInt(2, maHopDong);
+                psHoaDon.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
+                psHoaDon.setDouble(4, tongTien);
+                psHoaDon.setDouble(5, tienHongTB);
+
+                psHoaDon.executeUpdate();
+
+                // Lấy MaHD vừa tạo
+                try (ResultSet rs = psHoaDon.getGeneratedKeys()) {
+                    if (!rs.next()) {
+                        throw new SQLException("Không lấy được MaHD");
+                    }
+
                     int maHD = rs.getInt(1);
 
-                    // Thêm vào bảng TAOHOADON
                     psTaoHoaDon.setInt(1, maHD);
                     psTaoHoaDon.setInt(2, maNV);
                     psTaoHoaDon.executeUpdate();
                 }
-            }
 
             con.commit(); // Commit giao dịch
             ThongKeDAO.capNhatThongKeTheoHoaDon(maHopDong);
@@ -374,15 +381,8 @@ public class HoaDonDAO {
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            try (Connection con = JDBCUtil.getConnection()) {
-                if (con != null) {
-                    con.rollback(); // Rollback giao dịch nếu có lỗi
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            return false;
         }
-        return false;
     }
 
     public static long tinhThoiGian(String checkInDateTime, String checkOutDateTime) {
@@ -496,7 +496,7 @@ public class HoaDonDAO {
             String sql = "SELECT SUM(H.TONGTIEN) AS doanh_thu, EXTRACT(YEAR FROM H.NGAYLAPHD) AS nam "
                     + "FROM HOADON H "
                     + "GROUP BY EXTRACT(YEAR FROM H.NGAYLAPHD)";
-            
+
             Connection con = JDBCUtil.getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -516,5 +516,5 @@ public class HoaDonDAO {
         }
         return DS_DoanhThu;
     }
-    
+
 }

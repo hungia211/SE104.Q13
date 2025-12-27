@@ -560,19 +560,29 @@ public class PhongDAO {
         return phong;
     }
 
-    public static boolean updateTinhTrang(int maPhong, String tinhTrang) {
-        String sql = "UPDATE PHONG SET TinhTrang = ? WHERE MaPhong = ?";
-        try (Connection conn = JDBCUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+    public static boolean updatePhong(
+            int maPhong,
+            String tinhTrang,
+            int maLoai
+    ) {
+        String sql =
+            "UPDATE PHONG SET TinhTrang = ?, MaLoai = ? WHERE MaPhong = ?";
+
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, tinhTrang);
-            ps.setInt(2, maPhong);
+            ps.setInt(2, maLoai);
+            ps.setInt(3, maPhong);
 
-            return ps.executeUpdate() > 0; // thành công trả true
+            return ps.executeUpdate() > 0;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
 
     public static String getTinhTrangPhong(int maPhong) {
         String sql = "SELECT TinhTrang FROM PHONG WHERE MaPhong = ?";
@@ -589,5 +599,112 @@ public class PhongDAO {
         }
         return null;
     }
+    
+    public static ArrayList<LoaiPhongModel> getAllLoaiPhong() throws SQLException {
+        ArrayList<LoaiPhongModel> list = new ArrayList<>();
+        Connection con = JDBCUtil.getConnection();
+
+        String sql = "SELECT MaLoai, TenLoai, Gia FROM LOAIPHONG ORDER BY MaLoai";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            LoaiPhongModel lp = new LoaiPhongModel(
+                rs.getInt("MaLoai"),
+                rs.getString("TenLoai"),
+                rs.getLong("Gia")
+            );
+            list.add(lp);
+        }
+
+        con.close();
+        return list;
+    }
+    
+    public static int getMaLoaiTheoTen(String tenLoai) {
+        String sql = "SELECT MaLoai FROM LOAIPHONG WHERE TenLoai = ?";
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, tenLoai);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("MaLoai");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1; // không tìm thấy
+    }
+    
+    public static boolean insertLoaiPhong(String tenLoai, long gia) {
+        String sql = """
+            INSERT INTO LOAIPHONG (MaLoai, TenLoai, Gia)
+            VALUES (LoaiPhong_Seq.NEXTVAL, ?, ?)
+        """;
+
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, tenLoai);
+            ps.setLong(2, gia);
+            ps.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            return false; // trùng tên
+        }
+    }
+
+    public static boolean updateLoaiPhong(int maLoai, String tenLoai, long gia) {
+        String sql = "UPDATE LOAIPHONG SET TenLoai = ?, Gia = ? WHERE MaLoai = ?";
+
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, tenLoai);
+            ps.setLong(2, gia);
+            ps.setInt(3, maLoai);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean canDeleteLoaiPhong(int maLoai) {
+        String sql = "SELECT COUNT(*) FROM PHONG WHERE MaLoai = ?";
+
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, maLoai);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public static boolean deleteLoaiPhong(int maLoai) {
+        String sql = "DELETE FROM LOAIPHONG WHERE MaLoai = ?";
+
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, maLoai);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 }

@@ -798,6 +798,8 @@ public class HopDongFrame extends javax.swing.JFrame {
             tableModel.addRow(row);
         }
     }
+    
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -841,14 +843,9 @@ public class HopDongFrame extends javax.swing.JFrame {
         TraPhongButton = new javax.swing.JButton();
         SuaHopDongPanel = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         gioiTinhjLabel = new javax.swing.JLabel();
         sua_tinhTrangHDjComboBox = new javax.swing.JComboBox<>();
-        sua_slNguoiLonjTextField = new javax.swing.JTextField();
         sua_huyjButton = new javax.swing.JButton();
-        sua_slTreEmjTextField = new javax.swing.JTextField();
-        hoTenjLable = new javax.swing.JLabel();
-        CCCDjLabel = new javax.swing.JLabel();
         sua_luujButton = new javax.swing.JButton();
         DichVuPanel = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
@@ -1139,11 +1136,11 @@ public class HopDongFrame extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Mã Hợp Đồng", "Mã KH", "Ngày Lập Hợp Đồng", "Thời Gian Nhận Phòng", "Thời Gian Trả Phòng", "Tình Trạng HĐ", "Tiền cọc", "Ngày/Giờ"
+                "Mã Hợp Đồng", "Mã KH", "Ngày Lập Hợp Đồng", "Thời Gian Nhận Phòng", "Thời Gian Trả Phòng", "Tình Trạng HĐ", "Trị Giá HĐ", "Hinh thức thuê"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.Object.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -1253,20 +1250,11 @@ public class HopDongFrame extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(24, 24, 68));
         jLabel9.setText("HỢP ĐỒNG");
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel3.setText("Nhập thông tin cần sửa");
-
         gioiTinhjLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         gioiTinhjLabel.setText("Tình trạng Hợp đồng");
 
         sua_tinhTrangHDjComboBox.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         sua_tinhTrangHDjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Đã xác nhận", "Chưa xác nhận", "Đã nhận phòng" }));
-
-        sua_slNguoiLonjTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sua_slNguoiLonjTextFieldActionPerformed(evt);
-            }
-        });
 
         sua_huyjButton.setBackground(new java.awt.Color(24, 24, 68));
         sua_huyjButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -1277,12 +1265,6 @@ public class HopDongFrame extends javax.swing.JFrame {
                 sua_huyjButtonActionPerformed(evt);
             }
         });
-
-        hoTenjLable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        hoTenjLable.setText("Số lượng người lớn");
-
-        CCCDjLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        CCCDjLabel.setText("Số lượng trẻ em");
 
         sua_luujButton.setBackground(new java.awt.Color(24, 24, 68));
         sua_luujButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -1302,22 +1284,13 @@ public class HopDongFrame extends javax.swing.JFrame {
                 .addGap(35, 35, 35)
                 .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(SuaHopDongPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addGap(51, 51, 51)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(SuaHopDongPanelLayout.createSequentialGroup()
                         .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sua_tinhTrangHDjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(gioiTinhjLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(29, 29, 29)
-                        .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(sua_slNguoiLonjTextField)
-                            .addComponent(hoTenjLable, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(sua_slTreEmjTextField)
-                            .addComponent(CCCDjLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE))
-                        .addGap(35, 35, 35))))
+                        .addContainerGap(475, Short.MAX_VALUE))
+                    .addGroup(SuaHopDongPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, SuaHopDongPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(sua_luujButton, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1329,20 +1302,12 @@ public class HopDongFrame extends javax.swing.JFrame {
             SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(SuaHopDongPanelLayout.createSequentialGroup()
                 .addGap(35, 35, 35)
-                .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jLabel9)
                 .addGap(60, 60, 60)
-                .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(gioiTinhjLabel)
-                    .addComponent(hoTenjLable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CCCDjLabel))
+                .addComponent(gioiTinhjLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sua_tinhTrangHDjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sua_slNguoiLonjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sua_slTreEmjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 312, Short.MAX_VALUE)
+                .addComponent(sua_tinhTrangHDjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 313, Short.MAX_VALUE)
                 .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sua_huyjButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sua_luujButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1893,11 +1858,6 @@ public class HopDongFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_sua_huyjButtonActionPerformed
 
     private void sua_luujButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sua_luujButtonActionPerformed
-        // Lấy thông tin nhập liệu mới
-        String slNL = this.sua_slNguoiLonjTextField.getText();
-        int slNguoiLon = Integer.parseInt(slNL);
-        String slTE = this.sua_slTreEmjTextField.getText();
-        int slTreEm = Integer.parseInt(slTE);
 
         String tinhTrangHD = (String) this.sua_tinhTrangHDjComboBox.getSelectedItem();
 
@@ -1912,8 +1872,6 @@ public class HopDongFrame extends javax.swing.JFrame {
                 // Thực hiện cập nhật trong cơ sở dữ liệu
                 if (HopDongDAO.CapNhatHopDong(maHopDongSua, hopDongCu)) {
                     JOptionPane.showMessageDialog(rootPane, "Cập nhật thành công!", "Thông báo", JOptionPane.PLAIN_MESSAGE);
-                    this.sua_slNguoiLonjTextField.setText("");
-                    this.sua_slTreEmjTextField.setText("");
                     cardlayout.show(mainCardLayoutHDong, "hopDong");
                     inDanhSach();
                 } else {
@@ -1934,10 +1892,6 @@ public class HopDongFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(rootPane, "Lỗi không xác định!", "Thông báo", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_sua_luujButtonActionPerformed
-
-    private void sua_slNguoiLonjTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sua_slNguoiLonjTextFieldActionPerformed
-
-    }//GEN-LAST:event_sua_slNguoiLonjTextFieldActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         themTrangBiHong();
@@ -2090,7 +2044,6 @@ public class HopDongFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextPane BillTextPane;
-    private javax.swing.JLabel CCCDjLabel;
     private javax.swing.JLabel ChamCongLb;
     private javax.swing.JLabel DangXuatLb;
     private javax.swing.JPanel DichVuHong;
@@ -2114,7 +2067,6 @@ public class HopDongFrame extends javax.swing.JFrame {
     private javax.swing.JLabel giatbDV1;
     private javax.swing.JLabel gioiTinhjLabel;
     private javax.swing.JLabel hangkh;
-    private javax.swing.JLabel hoTenjLable;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -2129,7 +2081,6 @@ public class HopDongFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -2148,8 +2099,6 @@ public class HopDongFrame extends javax.swing.JFrame {
     private javax.swing.JSpinner slDV;
     private javax.swing.JButton sua_huyjButton;
     private javax.swing.JButton sua_luujButton;
-    private javax.swing.JTextField sua_slNguoiLonjTextField;
-    private javax.swing.JTextField sua_slTreEmjTextField;
     private javax.swing.JComboBox<String> sua_tinhTrangHDjComboBox;
     private javax.swing.JButton suajButton;
     private Image.SVGImage svgCC;
