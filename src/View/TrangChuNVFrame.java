@@ -7,30 +7,33 @@ import Model.NhanVienModel;
 import Model.ThongKeModel;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 public class TrangChuNVFrame extends javax.swing.JFrame {
 
     private static NhanVienModel currentUser;
-    private DefaultTableModel thongKeTableModel;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
-    private javax.swing.JComboBox<Integer> thongKeThangComboBox;
     private javax.swing.JComboBox<Integer> thongKeNamComboBox;
     private javax.swing.JLabel tongDoanhThuLabel;
     private javax.swing.JButton thongKeTaiDuLieuButton;
     private javax.swing.JPanel thongKePanel;
-    private javax.swing.JScrollPane thongKeScrollPane;
-    private javax.swing.JTable thongKeTable;
+    private DoanhThuChartPanel thongKeChartPanel;
+    private boolean isReloadingNam;
 
     public TrangChuNVFrame() {
         initComponents();
@@ -435,13 +438,6 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
         javax.swing.JPanel thongKeFilterPanel = new javax.swing.JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
         thongKeFilterPanel.setBackground(new java.awt.Color(255, 255, 255));
 
-        javax.swing.JLabel thongKeThangLabel = new javax.swing.JLabel();
-        thongKeThangLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        thongKeThangLabel.setText("Tháng:");
-
-        thongKeThangComboBox = new javax.swing.JComboBox<>();
-        thongKeThangComboBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-
         javax.swing.JLabel thongKeNamLabel = new javax.swing.JLabel();
         thongKeNamLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         thongKeNamLabel.setText("Năm:");
@@ -455,8 +451,6 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
         thongKeTaiDuLieuButton.setForeground(new java.awt.Color(255, 255, 255));
         thongKeTaiDuLieuButton.setText("Tải dữ liệu");
 
-        thongKeFilterPanel.add(thongKeThangLabel);
-        thongKeFilterPanel.add(thongKeThangComboBox);
         thongKeFilterPanel.add(thongKeNamLabel);
         thongKeFilterPanel.add(thongKeNamComboBox);
         thongKeFilterPanel.add(thongKeTaiDuLieuButton);
@@ -480,21 +474,11 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
         thongKeTopPanel.add(thongKeFilterPanel);
         thongKeTopPanel.add(thongKeSummaryPanel);
 
-        thongKeTableModel = new DefaultTableModel(
-            new Object [][] {},
-            new String [] {
-                "Mã loại", "Loại phòng", "Doanh thu"
-            }
-        ) {
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        thongKeTable = new JTable(thongKeTableModel);
-        thongKeScrollPane = new JScrollPane(thongKeTable);
+        thongKeChartPanel = new DoanhThuChartPanel();
+        thongKeChartPanel.setPreferredSize(new Dimension(600, 320));
 
         thongKePanel.add(thongKeTopPanel, BorderLayout.NORTH);
-        thongKePanel.add(thongKeScrollPane, BorderLayout.CENTER);
+        thongKePanel.add(thongKeChartPanel, BorderLayout.CENTER);
         javax.swing.JPanel thongKeExportPanel = new javax.swing.JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 6));
         thongKeExportPanel.setBackground(new java.awt.Color(255, 255, 255));
         thongKeExportPanel.add(doanhThuThangjButton);
@@ -534,71 +518,76 @@ public class TrangChuNVFrame extends javax.swing.JFrame {
 
     private void khoiTaoThongKe() {
         loadNamThongKe();
-        loadThangThongKe();
         taiDuLieuThongKe();
-        thongKeNamComboBox.addActionListener(evt -> loadThangThongKe());
-        thongKeTaiDuLieuButton.addActionListener(evt -> taiDuLieuThongKe());
+        thongKeNamComboBox.addActionListener(evt -> {
+            if (!isReloadingNam) {
+                taiDuLieuThongKe();
+            }
+        });
+        thongKeTaiDuLieuButton.addActionListener(evt -> {
+            lamMoiNamThongKe();
+            taiDuLieuThongKe();
+        });
     }
 
     private void loadNamThongKe() {
+        loadNamThongKe(null);
+    }
+
+    private void loadNamThongKe(Integer preferredYear) {
+        isReloadingNam = true;
         thongKeNamComboBox.removeAllItems();
         ArrayList<Integer> dsNam = ThongKeDAO.getNamThongKe();
         if (dsNam.isEmpty()) {
             thongKeNamComboBox.addItem(LocalDate.now().getYear());
+            isReloadingNam = false;
             return;
         }
         for (Integer nam : dsNam) {
             thongKeNamComboBox.addItem(nam);
         }
         int currentYear = LocalDate.now().getYear();
-        if (dsNam.contains(currentYear)) {
+        if (preferredYear != null && dsNam.contains(preferredYear)) {
+            thongKeNamComboBox.setSelectedItem(preferredYear);
+        } else if (dsNam.contains(currentYear)) {
             thongKeNamComboBox.setSelectedItem(currentYear);
+        } else {
+            thongKeNamComboBox.setSelectedItem(dsNam.get(0));
         }
+        isReloadingNam = false;
     }
 
-    private void loadThangThongKe() {
-        thongKeThangComboBox.removeAllItems();
-        Integer nam = (Integer) thongKeNamComboBox.getSelectedItem();
-        ArrayList<Integer> dsThang = new ArrayList<>();
-        if (nam != null) {
-            dsThang = ThongKeDAO.getThangThongKe(nam);
-        }
-        if (dsThang.isEmpty()) {
-            for (int i = 1; i <= 12; i++) {
-                thongKeThangComboBox.addItem(i);
-            }
-            thongKeThangComboBox.setSelectedItem(LocalDate.now().getMonthValue());
-            return;
-        }
-        for (Integer thang : dsThang) {
-            thongKeThangComboBox.addItem(thang);
-        }
-        int currentMonth = LocalDate.now().getMonthValue();
-        if (dsThang.contains(currentMonth)) {
-            thongKeThangComboBox.setSelectedItem(currentMonth);
-        }
+    private void lamMoiNamThongKe() {
+        Integer selectedYear = (Integer) thongKeNamComboBox.getSelectedItem();
+        loadNamThongKe(selectedYear);
     }
 
     private void taiDuLieuThongKe() {
-        Integer thang = (Integer) thongKeThangComboBox.getSelectedItem();
         Integer nam = (Integer) thongKeNamComboBox.getSelectedItem();
-        if (thang == null || nam == null) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn tháng và năm.", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        if (nam == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn năm.", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        ArrayList<ThongKeModel> ds = ThongKeDAO.getThongKeByThangNam(thang, nam);
-        thongKeTableModel.setRowCount(0);
+        ArrayList<ThongKeModel> ds = ThongKeDAO.getDoanhThuTheoNam(nam);
+        Map<Integer, ThongKeSeries> seriesMap = new TreeMap<>();
+        double tongDoanhThu = 0;
         for (ThongKeModel tk : ds) {
-            thongKeTableModel.addRow(new Object[]{
-                tk.getMaLoai(),
-                tk.getTenLoai(),
-                currencyFormat.format(tk.getDoanhThu())
-            });
+            ThongKeSeries series = seriesMap.get(tk.getMaLoai());
+            if (series == null) {
+                series = new ThongKeSeries(tk.getMaLoai(), tk.getTenLoai(), new double[12]);
+                seriesMap.put(tk.getMaLoai(), series);
+            }
+            int thangIndex = tk.getThang() - 1;
+            if (thangIndex >= 0 && thangIndex < 12) {
+                series.values[thangIndex] += tk.getDoanhThu();
+                tongDoanhThu += tk.getDoanhThu();
+            }
         }
-        double tongDoanhThu = ThongKeDAO.getTongDoanhThu(thang, nam);
+        List<ThongKeSeries> seriesList = new ArrayList<>(seriesMap.values());
+        thongKeChartPanel.setData(seriesList, nam);
         tongDoanhThuLabel.setText(currencyFormat.format(tongDoanhThu));
         if (ds.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Không có dữ liệu thống kê cho tháng/năm đã chọn.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Không có dữ liệu thống kê cho năm đã chọn.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -796,5 +785,128 @@ public void addSVG() {
     private Image.SVGImage svgPhong;
     private Image.SVGImage svgTB;
     // End of variables declaration//GEN-END:variables
+
+    private static class ThongKeSeries {
+        private final int maLoai;
+        private final String tenLoai;
+        private final double[] values;
+
+        private ThongKeSeries(int maLoai, String tenLoai, double[] values) {
+            this.maLoai = maLoai;
+            this.tenLoai = tenLoai;
+            this.values = values;
+        }
+    }
+
+    private class DoanhThuChartPanel extends javax.swing.JPanel {
+        private final List<ThongKeSeries> seriesList = new ArrayList<>();
+        private int nam;
+
+        private void setData(List<ThongKeSeries> series, int nam) {
+            this.seriesList.clear();
+            this.seriesList.addAll(series);
+            this.nam = nam;
+            repaint();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int width = getWidth();
+            int height = getHeight();
+            int leftPadding = 70;
+            int rightPadding = 20;
+            int topPadding = 25;
+            int bottomPadding = 50;
+
+            g2.setColor(Color.WHITE);
+            g2.fillRect(0, 0, width, height);
+
+            if (seriesList.isEmpty()) {
+                g2.setColor(new Color(120, 120, 120));
+                g2.drawString("Không có dữ liệu để hiển thị", leftPadding, height / 2);
+                return;
+            }
+
+            double maxValue = 0;
+            for (ThongKeSeries series : seriesList) {
+                for (double value : series.values) {
+                    maxValue = Math.max(maxValue, value);
+                }
+            }
+            if (maxValue <= 0) {
+                maxValue = 1;
+            }
+
+            int plotWidth = width - leftPadding - rightPadding;
+            int plotHeight = height - topPadding - bottomPadding;
+
+            g2.setColor(new Color(200, 200, 200));
+            g2.drawLine(leftPadding, topPadding, leftPadding, topPadding + plotHeight);
+            g2.drawLine(leftPadding, topPadding + plotHeight, leftPadding + plotWidth, topPadding + plotHeight);
+
+            int ticks = 5;
+            for (int i = 0; i <= ticks; i++) {
+                int y = topPadding + plotHeight - (int) ((plotHeight * i) / (double) ticks);
+                g2.setColor(new Color(230, 230, 230));
+                g2.drawLine(leftPadding, y, leftPadding + plotWidth, y);
+                g2.setColor(new Color(90, 90, 90));
+                double tickValue = (maxValue * i) / ticks;
+                String tickLabel = currencyFormat.format(tickValue);
+                g2.drawString(tickLabel, 8, y + 5);
+            }
+
+            int seriesCount = seriesList.size();
+            double groupWidth = plotWidth / 12.0;
+            double groupPadding = Math.max(6, groupWidth * 0.1);
+            double barGap = 6;
+            double barWidth = (groupWidth - 2 * groupPadding - barGap * (seriesCount - 1)) / seriesCount;
+            if (barWidth < 4) {
+                barWidth = 4;
+            }
+
+            Color[] palette = new Color[]{
+                new Color(24, 24, 68),
+                new Color(0, 102, 204),
+                new Color(220, 220, 46),
+                new Color(255, 102, 0),
+                new Color(50, 150, 120)
+            };
+
+            for (int m = 0; m < 12; m++) {
+                double groupStart = leftPadding + m * groupWidth + groupPadding;
+                double labelX = leftPadding + m * groupWidth + groupWidth / 2.0;
+                g2.setColor(new Color(90, 90, 90));
+                g2.drawString(String.valueOf(m + 1), (int) labelX - 3, topPadding + plotHeight + 20);
+                for (int s = 0; s < seriesCount; s++) {
+                    ThongKeSeries series = seriesList.get(s);
+                    Color barColor = palette[s % palette.length];
+                    double value = series.values[m];
+                    int barHeight = (int) Math.round((value / maxValue) * plotHeight);
+                    int x = (int) Math.round(groupStart + s * (barWidth + barGap));
+                    int y = topPadding + plotHeight - barHeight;
+                    g2.setColor(barColor);
+                    g2.fillRect(x, y, (int) barWidth, barHeight);
+                }
+            }
+
+            int legendX = leftPadding + plotWidth - 160;
+            int legendY = topPadding + 10;
+            g2.setColor(new Color(90, 90, 90));
+            g2.drawString("Năm: " + nam, leftPadding, topPadding - 5);
+            for (int i = 0; i < seriesCount; i++) {
+                ThongKeSeries series = seriesList.get(i);
+                Color barColor = palette[i % palette.length];
+                int y = legendY + i * 18;
+                g2.setColor(barColor);
+                g2.fillRect(legendX, y - 10, 12, 12);
+                g2.setColor(new Color(60, 60, 60));
+                g2.drawString(series.tenLoai, legendX + 18, y);
+            }
+        }
+    }
 
 }

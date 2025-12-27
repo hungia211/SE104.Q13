@@ -22,7 +22,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
     private static NhanVienModel currentUser;
     private DefaultTableModel TableHD;
     HoaDonJDialog dialog = new HoaDonJDialog();
-    ArrayList<Vector> DS_HD;
+    ArrayList<Vector<Object>> DS_HD;
 
     public HoaDonFrame() throws SQLException {
         FlatIntelliJLaf.registerCustomDefaultsSource("style");
@@ -63,7 +63,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
         DefaultTableModel tableHD = (DefaultTableModel) HoaDonJTable.getModel();
         DS_HD = HoaDonDAO.getDataHD();
         tableHD.setRowCount(0);
-        for (Vector temp : DS_HD) {
+        for (Vector<Object> temp : DS_HD) {
             tableHD.addRow(temp);
         }
     }
@@ -513,11 +513,11 @@ public class HoaDonFrame extends javax.swing.JFrame {
         // Hiển thị mã hợp đồng, chuyển đổi giá trị int sang String để hiển thị
         dialog.MaHopDongjLabel.setText("Mã hợp đồng: " + Integer.toString(hd.getMaHopDong()));
         dialog.TienHongTBjLabel.setText("Tiền hỏng trang bị : " + String.format("%,.0f", hd.getTienHongTB()) + " VND");
-        ArrayList<Vector> cthd = HoaDonDAO.getCTHD(hd.getMaHD());
+        ArrayList<Vector<Object>> cthd = HoaDonDAO.getCTHD(hd.getMaHD());
         System.out.println("Dữ liệu CTHD: " + cthd);
         DefaultTableModel tableModel = (DefaultTableModel) dialog.CTHDjTabel.getModel();
         tableModel.setRowCount(0);
-        for (Vector row : cthd) {
+        for (Vector<Object> row : cthd) {
             tableModel.addRow(row);
         }
     }
@@ -536,15 +536,15 @@ public class HoaDonFrame extends javax.swing.JFrame {
                 LoadDanhSachHD();  // Nếu cả hai trường đều không có dữ liệu, tải lại danh sách hóa đơn
             } else if (ngay == null && ten != null) {
                 // Nếu chỉ có tên, gọi hàm tìm kiếm theo tên
-                ArrayList<Vector> DSHD = HoaDonDAO.getDSHDTheoTenKhachHang(ten);
+                ArrayList<Vector<Object>> DSHD = HoaDonDAO.getDSHDTheoTenKhachHang(ten);
                 updateTable(DSHD);
             } else if (ngay != null && ten == null) {
                 // Nếu chỉ có ngày, gọi hàm tìm kiếm theo ngày
-                ArrayList<Vector> DSHD = HoaDonDAO.getDSHDTheoNgay(ngay);
+                ArrayList<Vector<Object>> DSHD = HoaDonDAO.getDSHDTheoNgay(ngay);
                 updateTable(DSHD);
             } else if (ngay != null && ten != null) {
                 // Nếu cả ngày và tên đều có, gọi hàm tìm kiếm theo cả ngày và tên
-                ArrayList<Vector> DSHD = HoaDonDAO.getDSHDTheoNgayVaTen(ngay, ten);
+                ArrayList<Vector<Object>> DSHD = HoaDonDAO.getDSHDTheoNgayVaTen(ngay, ten);
                 updateTable(DSHD);
             }
         } catch (SQLException ex) {
@@ -666,10 +666,10 @@ public class HoaDonFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_XuatHDjButtonActionPerformed
 
-    private void updateTable(ArrayList<Vector> DSHD) {
+    private void updateTable(ArrayList<Vector<Object>> DSHD) {
         DefaultTableModel tableHD = (DefaultTableModel) HoaDonJTable.getModel();
         tableHD.setRowCount(0);
-        for (Vector temp : DSHD) {
+        for (Vector<Object> temp : DSHD) {
             tableHD.addRow(temp);
         }
     }
