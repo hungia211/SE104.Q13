@@ -756,8 +756,8 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
         return DS_HopDong;
     }
 
-    public static ArrayList<Vector> getSoKHTrongThang() {
-        ArrayList<Vector> DS_SoKH = new ArrayList<>();
+    public static ArrayList<Vector<Object>> getSoKHTrongThang() {
+        ArrayList<Vector<Object>> DS_SoKH = new ArrayList<>();
 
         // Bảng HOPDONG không có cột SONGUOILON -> phải lấy từ CHITIETDATPHONG.SoKhach
         String sql = "SELECT SUM(c.SOKHACH) AS tong_so_khach, "
@@ -786,8 +786,8 @@ public static HopDongModel getHDtheoMaHopDong(int maHopDong) throws SQLException
         return DS_SoKH;
     }
 
-    public static ArrayList<Vector> getHTThuePhong() {
-        ArrayList<Vector> DS_HTThue = new ArrayList<>();
+    public static ArrayList<Vector<Object>> getHTThuePhong() {
+        ArrayList<Vector<Object>> DS_HTThue = new ArrayList<>();
 
         String sql = "SELECT HINHTHUCTHUE, COUNT(H.MAHOPDONG) as so_Hop_dong, "
                 + "EXTRACT(MONTH FROM H.NGAYLAPHOPDONG) AS thang, "
