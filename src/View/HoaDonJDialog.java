@@ -48,11 +48,11 @@ public class HoaDonJDialog extends javax.swing.JDialog {
 
             },
             new String [] {
-                "Mã phòng", "Hình thức thuê", "Ngày nhận phòng ", "Ngày trả phòng", "Thành tiền  "
+                "Mã phòng", "Số khách", "Hình thức thuê", "Ngày nhận phòng ", "Ngày trả phòng", "Thành tiền  "
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {

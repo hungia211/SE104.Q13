@@ -72,18 +72,19 @@ import javax.swing.SwingUtilities;
 
 public class HopDongFrame extends javax.swing.JFrame {
 
-    ArrayList<Vector> tinhtoan = new ArrayList<>();
+    ArrayList<Vector<Integer>> tinhtoan = new ArrayList<>();
     Vector<Double> tien = new Vector<>();
     int tongsl = 0;
     double tong = 0.0;
     double thanhtienfinal;
     double tiengocfinal;
     double tongtienfinal;
+    double tiengiamfinal;
     int maHopDongfinal;
 
     DecimalFormat df = new DecimalFormat("#");
     // Tạo NumberFormat với Local cho Việt Nam
-    NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+    NumberFormat numberFormat = NumberFormat.getInstance(Locale.forLanguageTag("vi-VN"));
     int maHopDongTinh;
     String ngayden;
     String ngaydi;
@@ -150,10 +151,8 @@ public class HopDongFrame extends javax.swing.JFrame {
         defaultTableModel.addColumn("Thời Gian Nhận Phòng");
         defaultTableModel.addColumn("Thời Gian Trả Phòng");
         defaultTableModel.addColumn("Tình Trạng HĐ");
-        defaultTableModel.addColumn("SL Người Lớn");
-        defaultTableModel.addColumn("SL Trẻ Em");
-        defaultTableModel.addColumn("Trị Giá HĐ");
-        defaultTableModel.addColumn("Hình thức thuê");
+        defaultTableModel.addColumn("Tiền cọc");
+        defaultTableModel.addColumn("Ngày/Giờ");
 
         tableHopDong.setModel(defaultTableModel);
     }
@@ -170,7 +169,7 @@ public class HopDongFrame extends javax.swing.JFrame {
             defaultTableModel.addRow(new Object[]{
                 hopDong.getMaHopDong(), hopDong.getMaKH(), hopDong.getNgayLapHopDong(),
                 hopDong.getTGNhanPhong(), hopDong.getTGTraPhong(), hopDong.getTinhTrangHD(),
-                hopDong.getSoLuongNguoiLon(), hopDong.getSoLuongTreEm(), hopDong.getTriGiaHopDong(),
+                numberFormat.format(hopDong.getTriGiaHopDong()),
                 hopDong.getHinhThucThue()
             });
         }
@@ -207,7 +206,8 @@ public class HopDongFrame extends javax.swing.JFrame {
             defaultTableModel.addRow(new Object[]{
                 hopDong.getMaHopDong(), hopDong.getMaKH(), hopDong.getNgayLapHopDong(),
                 hopDong.getTGNhanPhong(), hopDong.getTGTraPhong(), hopDong.getTinhTrangHD(),
-                hopDong.getSoLuongNguoiLon(), hopDong.getSoLuongTreEm(), numberFormat.format((int) hopDong.getTriGiaHopDong()), hopDong.getHinhThucThue()
+                numberFormat.format(hopDong.getTriGiaHopDong()),
+                hopDong.getHinhThucThue()
             });
         }
 
@@ -250,7 +250,8 @@ public class HopDongFrame extends javax.swing.JFrame {
             defaultTableModel.addRow(new Object[]{
                 hopDong.getMaHopDong(), hopDong.getMaKH(), hopDong.getNgayLapHopDong(),
                 hopDong.getTGNhanPhong(), hopDong.getTGTraPhong(), hopDong.getTinhTrangHD(),
-                hopDong.getSoLuongNguoiLon(), hopDong.getSoLuongTreEm(), numberFormat.format((int) hopDong.getTriGiaHopDong()), hopDong.getHinhThucThue()
+                numberFormat.format(hopDong.getTriGiaHopDong()),
+                hopDong.getHinhThucThue()
             });
         }
 
@@ -290,7 +291,8 @@ public class HopDongFrame extends javax.swing.JFrame {
             defaultTableModel.addRow(new Object[]{
                 hopDong.getMaHopDong(), hopDong.getMaKH(), hopDong.getNgayLapHopDong(),
                 hopDong.getTGNhanPhong(), hopDong.getTGTraPhong(), hopDong.getTinhTrangHD(),
-                hopDong.getSoLuongNguoiLon(), hopDong.getSoLuongTreEm(), numberFormat.format((int) hopDong.getTriGiaHopDong()), hopDong.getHinhThucThue()
+                numberFormat.format(hopDong.getTriGiaHopDong()),
+                hopDong.getHinhThucThue()
             });
         }
 
@@ -323,8 +325,7 @@ public class HopDongFrame extends javax.swing.JFrame {
             if (hopDong != null) {
 
                 sua_tinhTrangHDjComboBox.setSelectedItem(hopDong.getTinhTrangHD());
-                sua_slNguoiLonjTextField.setText(String.valueOf(hopDong.getSoLuongNguoiLon()));
-                sua_slTreEmjTextField.setText(String.valueOf(hopDong.getSoLuongTreEm()));
+
 
                 // chuyển đổi sang định dạng LocalDateTime
                 Date ngayLHD = convertToDate(hopDong.getNgayLapHopDong());
@@ -388,7 +389,7 @@ public class HopDongFrame extends javax.swing.JFrame {
     }
 
     public void themTrangBiHong() {
-        Vector v = new Vector();
+        Vector<Integer> v = new Vector<>();
         v.add(Integer.parseInt(matbDV.getText()));
         v.add(Integer.parseInt(slDV.getValue().toString()));
         tinhtoan.add(v);
@@ -417,7 +418,7 @@ public class HopDongFrame extends javax.swing.JFrame {
     public void resetVector() {
         tien.clear();
 
-        for (Vector<Double> vector : tinhtoan) {
+        for (Vector<Integer> vector : tinhtoan) {
             vector.clear();
         }
     }
@@ -448,6 +449,8 @@ public class HopDongFrame extends javax.swing.JFrame {
         int row = tableHopDong.getSelectedRow();
 
         if (row != -1) {
+            tien.clear();
+            tiengiamfinal = 0.0;
             int maKH = Integer.parseInt(tableHopDong.getValueAt(row, 1).toString());
             try {
                 // Tên KH
@@ -501,7 +504,15 @@ public class HopDongFrame extends javax.swing.JFrame {
                 tien.add(tongtien);
                 tt.setText("Tổng tiền phải thanh toán: " + numberFormat.format(tongtien));
                 tiendv.setText("Tiền dịch vụ: " + numberFormat.format(tong));
+                double thanhTien = tongtien + tong;
+                this.thanhtienfinal = thanhTien;
+                tiengiam.setText("Tiền giảm: 0");
+                this.tiengiamfinal = 0.0;
+                thanhtien.setText("Thành tiền: " + numberFormat.format(thanhTien));
                 setMaKM(hang);
+                if (kmComboBox.getItemCount() > 0) {
+                    kmComboBox.setSelectedIndex(0);
+                }
                 chonMaKM(tiengoc, tongtien);
                 
 
@@ -513,9 +524,10 @@ public class HopDongFrame extends javax.swing.JFrame {
 
     public void setMaKM(String hang) {
         ArrayList<KhuyenMaiModel> kml = KhuyenMaiDAO.getDSKhuyenMaitheoNgay(ngayden, ngaydi);
-
-        LocalDate currentDate = LocalDate.now();
-
+        for (ActionListener al : kmComboBox.getActionListeners()) {
+            kmComboBox.removeActionListener(al);
+        }
+        kmComboBox.removeAllItems();
         kmComboBox.addItem("");
 
         for (KhuyenMaiModel km : kml) {
@@ -543,15 +555,19 @@ public class HopDongFrame extends javax.swing.JFrame {
         kmComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!("".equals(kmComboBox.getSelectedItem()))) {
-                    double giam = KhuyenMaiDAO.getGiamGia_MaKM(Integer.parseInt((String) kmComboBox.getSelectedItem()));
-                    double tg = tiengoc * giam;
-                    double tt = tongtien - tg;
-                    
-                    
-                    tiengiam.setText("Tiền giảm: -" + numberFormat.format(tg));
-                    thanhtien.setText("Thành tiền: " + numberFormat.format(tt));
+                String maKM = (String) kmComboBox.getSelectedItem();
+                double tg = 0;
+                if (maKM != null && !maKM.isEmpty()) {
+                    double giam = KhuyenMaiDAO.getGiamGia_MaKM(Integer.parseInt(maKM));
+                    tg = tiengoc * giam;
                 }
+                double tt = tongtien + tong - tg;
+                if (tg > 0) {
+                    tiengiam.setText("Tiền giảm: -" + numberFormat.format(tg));
+                } else {
+                    tiengiam.setText("Tiền giảm: 0");
+                }
+                thanhtien.setText("Thành tiền: " + numberFormat.format(tt));
             }
         });
         
@@ -601,14 +617,10 @@ public class HopDongFrame extends javax.swing.JFrame {
         }
         int maHD = HoaDonDAO.getMaxRow() + 1;
 
-        double tiengoc = tien.get(0);
-        double tg = Double.parseDouble(tiengiam.getText().substring(11));
-        //double tongtien = tiengoc - Double.parseDouble(tableHopDong.getValueAt(row, 8).toString()) - tg;
-        double tongtien = tien.get(1);
-        String tongStr = tiendv.getText().substring(14).replace(".", "");
-        double dichvu = Double.parseDouble(tongStr);
-
-        double thanhtien = dichvu + tongtien - tg;
+        double tongtien = tongtienfinal;
+        double dichvu = tong;
+        double tg = tiengiamfinal;
+        double thanhtien = thanhtienfinal;
 
         System.out.println(tableHopDong.getValueAt(row, 3).toString());
 
@@ -654,7 +666,7 @@ public class HopDongFrame extends javax.swing.JFrame {
                 + "<hr>"
                 + "<table>"
                 + "<tr><td class='left'>Tổng tiền:</td><td class='right'>" + numberFormat.format(tongtien) + " VND" + "</td></tr>"
-                + "<tr><td class='left'>Mã khuyến mãi: " + (String) kmComboBox.getSelectedItem() + "</td><td class='right'>" + tg + "</td></tr>"
+                + "<tr><td class='left'>Mã khuyến mãi: " + (String) kmComboBox.getSelectedItem() + "</td><td class='right'>" + (tg > 0 ? ("-" + numberFormat.format(tg)) : "0") + "</td></tr>"
                 + "<tr><td class='left'>Tiền dịch vụ:</td><td class='right'>" + numberFormat.format(dichvu) + " VND" + "</td></tr>"
                 + "<tr><td class='left bold'>Thành tiền:</td><td class='right'>" + numberFormat.format(thanhtien) + " VND" + "</td></tr>"
                 + "</table>"
@@ -786,6 +798,8 @@ public class HopDongFrame extends javax.swing.JFrame {
             tableModel.addRow(row);
         }
     }
+    
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -829,14 +843,9 @@ public class HopDongFrame extends javax.swing.JFrame {
         TraPhongButton = new javax.swing.JButton();
         SuaHopDongPanel = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         gioiTinhjLabel = new javax.swing.JLabel();
         sua_tinhTrangHDjComboBox = new javax.swing.JComboBox<>();
-        sua_slNguoiLonjTextField = new javax.swing.JTextField();
         sua_huyjButton = new javax.swing.JButton();
-        sua_slTreEmjTextField = new javax.swing.JTextField();
-        hoTenjLable = new javax.swing.JLabel();
-        CCCDjLabel = new javax.swing.JLabel();
         sua_luujButton = new javax.swing.JButton();
         DichVuPanel = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
@@ -1103,7 +1112,6 @@ public class HopDongFrame extends javax.swing.JFrame {
         jLabel8.setText("HỢP ĐỒNG");
 
         TieudeTK.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        TieudeTK.setForeground(new java.awt.Color(0, 0, 0));
         TieudeTK.setText("Tìm kiếm theo");
 
         timTheoComboBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -1111,11 +1119,7 @@ public class HopDongFrame extends javax.swing.JFrame {
         timTheoComboBox.setPreferredSize(new java.awt.Dimension(100, 40));
 
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Nhập thông tin");
-
-        nhapjTextField.setBackground(new java.awt.Color(255, 255, 255));
-        nhapjTextField.setForeground(new java.awt.Color(0, 0, 0));
 
         traCuujButton.setBackground(new java.awt.Color(24, 24, 68));
         traCuujButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -1127,18 +1131,16 @@ public class HopDongFrame extends javax.swing.JFrame {
             }
         });
 
-        tableHopDong.setBackground(new java.awt.Color(255, 255, 255));
-        tableHopDong.setForeground(new java.awt.Color(0, 0, 0));
         tableHopDong.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Mã Hợp Đồng", "Mã KH", "Ngày Lập Hợp Đồng", "Thời Gian Nhận Phòng", "Thời Gian Trả Phòng", "Tình Trạng HĐ", "SL Người Lớn", "SL Trẻ Em", "Trị Giá HĐ", "Hinh thức thuê"
+                "Mã Hợp Đồng", "Mã KH", "Ngày Lập Hợp Đồng", "Thời Gian Nhận Phòng", "Thời Gian Trả Phòng", "Tình Trạng HĐ", "Trị Giá HĐ", "Hinh thức thuê"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Object.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.Object.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -1248,26 +1250,11 @@ public class HopDongFrame extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(24, 24, 68));
         jLabel9.setText("HỢP ĐỒNG");
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Nhập thông tin cần sửa");
-
         gioiTinhjLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        gioiTinhjLabel.setForeground(new java.awt.Color(0, 0, 0));
         gioiTinhjLabel.setText("Tình trạng Hợp đồng");
 
-        sua_tinhTrangHDjComboBox.setBackground(new java.awt.Color(255, 255, 255));
         sua_tinhTrangHDjComboBox.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        sua_tinhTrangHDjComboBox.setForeground(new java.awt.Color(0, 0, 0));
         sua_tinhTrangHDjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Đã xác nhận", "Chưa xác nhận", "Đã nhận phòng" }));
-
-        sua_slNguoiLonjTextField.setBackground(new java.awt.Color(255, 255, 255));
-        sua_slNguoiLonjTextField.setForeground(new java.awt.Color(0, 0, 0));
-        sua_slNguoiLonjTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sua_slNguoiLonjTextFieldActionPerformed(evt);
-            }
-        });
 
         sua_huyjButton.setBackground(new java.awt.Color(24, 24, 68));
         sua_huyjButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -1278,17 +1265,6 @@ public class HopDongFrame extends javax.swing.JFrame {
                 sua_huyjButtonActionPerformed(evt);
             }
         });
-
-        sua_slTreEmjTextField.setBackground(new java.awt.Color(255, 255, 255));
-        sua_slTreEmjTextField.setForeground(new java.awt.Color(0, 0, 0));
-
-        hoTenjLable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        hoTenjLable.setForeground(new java.awt.Color(0, 0, 0));
-        hoTenjLable.setText("Số lượng người lớn");
-
-        CCCDjLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        CCCDjLabel.setForeground(new java.awt.Color(0, 0, 0));
-        CCCDjLabel.setText("Số lượng trẻ em");
 
         sua_luujButton.setBackground(new java.awt.Color(24, 24, 68));
         sua_luujButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -1308,22 +1284,13 @@ public class HopDongFrame extends javax.swing.JFrame {
                 .addGap(35, 35, 35)
                 .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(SuaHopDongPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addGap(51, 51, 51)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(SuaHopDongPanelLayout.createSequentialGroup()
                         .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sua_tinhTrangHDjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(gioiTinhjLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(29, 29, 29)
-                        .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(sua_slNguoiLonjTextField)
-                            .addComponent(hoTenjLable, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(sua_slTreEmjTextField)
-                            .addComponent(CCCDjLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE))
-                        .addGap(35, 35, 35))))
+                        .addContainerGap(475, Short.MAX_VALUE))
+                    .addGroup(SuaHopDongPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, SuaHopDongPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(sua_luujButton, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1335,20 +1302,12 @@ public class HopDongFrame extends javax.swing.JFrame {
             SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(SuaHopDongPanelLayout.createSequentialGroup()
                 .addGap(35, 35, 35)
-                .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jLabel9)
                 .addGap(60, 60, 60)
-                .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(gioiTinhjLabel)
-                    .addComponent(hoTenjLable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CCCDjLabel))
+                .addComponent(gioiTinhjLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sua_tinhTrangHDjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sua_slNguoiLonjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sua_slTreEmjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 312, Short.MAX_VALUE)
+                .addComponent(sua_tinhTrangHDjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 313, Short.MAX_VALUE)
                 .addGroup(SuaHopDongPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sua_huyjButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sua_luujButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1366,7 +1325,6 @@ public class HopDongFrame extends javax.swing.JFrame {
         jLabel11.setText("DỊCH VỤ*");
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
         jLabel5.setText("Có tổn thất về trang bị không?");
 
         jButton1.setBackground(new java.awt.Color(0, 51, 153));
@@ -1389,41 +1347,31 @@ public class HopDongFrame extends javax.swing.JFrame {
             }
         });
 
-        dichvuComboBox.setBackground(new java.awt.Color(255, 255, 255));
         dichvuComboBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        dichvuComboBox.setForeground(new java.awt.Color(0, 0, 0));
         dichvuComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Không", "Có" }));
 
         DichVuHong.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
         jLabel6.setText("Tổng giá dịch vụ:");
 
-        tentbComboBox.setBackground(new java.awt.Color(255, 255, 255));
         tentbComboBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tentbComboBox.setForeground(new java.awt.Color(0, 0, 0));
         tentbComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn" }));
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
         jLabel7.setText("Chọn các trang bị hỏng:");
 
         matbDV.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        matbDV.setForeground(new java.awt.Color(0, 0, 0));
 
         giatbDV.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        giatbDV.setForeground(new java.awt.Color(0, 0, 0));
 
         slDV.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         slDV.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
 
         jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel13.setForeground(new java.awt.Color(0, 0, 0));
         jLabel13.setText("Số lượng hỏng:");
 
         tongslDV.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tongslDV.setForeground(new java.awt.Color(0, 0, 0));
         tongslDV.setText("0");
 
         jButton4.setBackground(new java.awt.Color(0, 102, 204));
@@ -1437,19 +1385,15 @@ public class HopDongFrame extends javax.swing.JFrame {
         });
 
         tongslDV1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tongslDV1.setForeground(new java.awt.Color(0, 0, 0));
         tongslDV1.setText("Tổng số lượng:");
 
         tongDV.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tongDV.setForeground(new java.awt.Color(0, 0, 0));
         tongDV.setText("0");
 
         matbDV1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        matbDV1.setForeground(new java.awt.Color(0, 0, 0));
         matbDV1.setText("Mã trang bị:");
 
         giatbDV1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        giatbDV1.setForeground(new java.awt.Color(0, 0, 0));
         giatbDV1.setText("Giá trang bị:");
 
         javax.swing.GroupLayout DichVuHongLayout = new javax.swing.GroupLayout(DichVuHong);
@@ -1560,39 +1504,29 @@ public class HopDongFrame extends javax.swing.JFrame {
         jLabel10.setText("XÁC NHẬN THÔNG TIN *");
 
         thanhtien.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        thanhtien.setForeground(new java.awt.Color(0, 0, 0));
         thanhtien.setText("Thành tiền: 0");
 
-        kmComboBox.setBackground(new java.awt.Color(255, 255, 255));
         kmComboBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        kmComboBox.setForeground(new java.awt.Color(0, 0, 0));
 
         hangkh.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        hangkh.setForeground(new java.awt.Color(0, 0, 0));
         hangkh.setText("Hạng khách hàng:");
 
         jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(0, 0, 0));
         jLabel14.setText("Mã khuyến mãi:");
 
         tt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tt.setForeground(new java.awt.Color(0, 0, 0));
         tt.setText("Tổng tiền: 0");
 
         tiengiam.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tiengiam.setForeground(new java.awt.Color(0, 0, 0));
         tiengiam.setText("Tiền giảm: 0");
 
         tenkh.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tenkh.setForeground(new java.awt.Color(0, 0, 0));
         tenkh.setText("Tên khách hàng:");
 
         tiendv.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tiendv.setForeground(new java.awt.Color(0, 0, 0));
         tiendv.setText("Tiền dịch vụ: 0");
 
         mahd.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        mahd.setForeground(new java.awt.Color(0, 0, 0));
         mahd.setText("Mã hợp đồng:");
 
         jButton5.setBackground(new java.awt.Color(0, 102, 204));
@@ -1694,7 +1628,6 @@ public class HopDongFrame extends javax.swing.JFrame {
         jLabel12.setForeground(new java.awt.Color(24, 24, 68));
         jLabel12.setText("HOÁ ĐƠN");
 
-        BillTextPane.setBackground(new java.awt.Color(255, 255, 255));
         BillTextPane.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         jScrollPane2.setViewportView(BillTextPane);
 
@@ -1708,7 +1641,6 @@ public class HopDongFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton8.setBackground(new java.awt.Color(255, 255, 255));
         jButton8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jButton8.setForeground(new java.awt.Color(24, 24, 68));
         jButton8.setText("Quay lại");
@@ -1926,11 +1858,6 @@ public class HopDongFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_sua_huyjButtonActionPerformed
 
     private void sua_luujButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sua_luujButtonActionPerformed
-        // Lấy thông tin nhập liệu mới
-        String slNL = this.sua_slNguoiLonjTextField.getText();
-        int slNguoiLon = Integer.parseInt(slNL);
-        String slTE = this.sua_slTreEmjTextField.getText();
-        int slTreEm = Integer.parseInt(slTE);
 
         String tinhTrangHD = (String) this.sua_tinhTrangHDjComboBox.getSelectedItem();
 
@@ -1938,17 +1865,13 @@ public class HopDongFrame extends javax.swing.JFrame {
             // Lấy thông tin cũ của hợp đồng từ cơ sở dữ liệu
             HopDongModel hopDongCu = HopDongDAO.getHDtheoMaHopDong(maHopDongSua);
 
-            hopDongCu.setSoLuongTreEm(slTreEm);
             hopDongCu.setTinhTrangHD(tinhTrangHD);
-            hopDongCu.setSoLuongNguoiLon(slNguoiLon);
 
             int choice = JOptionPane.showConfirmDialog(rootPane, "Bạn có chắc chắn muốn sửa không?", "Xác nhận sửa", JOptionPane.OK_CANCEL_OPTION);
             if (choice == JOptionPane.OK_OPTION) {
                 // Thực hiện cập nhật trong cơ sở dữ liệu
                 if (HopDongDAO.CapNhatHopDong(maHopDongSua, hopDongCu)) {
                     JOptionPane.showMessageDialog(rootPane, "Cập nhật thành công!", "Thông báo", JOptionPane.PLAIN_MESSAGE);
-                    this.sua_slNguoiLonjTextField.setText("");
-                    this.sua_slTreEmjTextField.setText("");
                     cardlayout.show(mainCardLayoutHDong, "hopDong");
                     inDanhSach();
                 } else {
@@ -1969,10 +1892,6 @@ public class HopDongFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(rootPane, "Lỗi không xác định!", "Thông báo", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_sua_luujButtonActionPerformed
-
-    private void sua_slNguoiLonjTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sua_slNguoiLonjTextFieldActionPerformed
-
-    }//GEN-LAST:event_sua_slNguoiLonjTextFieldActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         themTrangBiHong();
@@ -2018,17 +1937,21 @@ public class HopDongFrame extends javax.swing.JFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         int row = tableHopDong.getSelectedRow();
 
-        String tongStr = tiendv.getText().substring(14).replace(".", "");
-        double dichvu = Double.parseDouble(tongStr);
+        double dichvu = tong;
         int maNV = currentUser.getMaNV();
         
         
-        double giam = KhuyenMaiDAO.getGiamGia_MaKM(Integer.parseInt((String) kmComboBox.getSelectedItem()));
+        String maKMStr = (String) kmComboBox.getSelectedItem();
+        double giam = 0;
+        if (maKMStr != null && !maKMStr.isEmpty()) {
+            giam = KhuyenMaiDAO.getGiamGia_MaKM(Integer.parseInt(maKMStr));
+        }
         System.out.println("giam tien: " + giam);
         double tg = tiengocfinal * giam;
         System.out.println("tien giam: " + tg);
-        double thanhtien = tongtienfinal - tg;
+        double thanhtien = tongtienfinal + dichvu - tg;
         this.thanhtienfinal = thanhtien;
+        this.tiengiamfinal = tg;
         System.out.println("thanh tien: " + thanhtien);
         
         
@@ -2037,7 +1960,7 @@ public class HopDongFrame extends javax.swing.JFrame {
         System.out.println(thanhtienfinal);
 
         int maHD = Integer.parseInt(tableHopDong.getValueAt(row, 0).toString());
-        if ("".equals(kmComboBox.getSelectedItem().toString())) {
+        if (maKMStr == null || maKMStr.isEmpty()) {
             if (HoaDonDAO.themHoaDonKhongMaKM(maHopDongTinh, thanhtien, dichvu, maNV)) {
                 JOptionPane.showMessageDialog(null, "Thanh toán thành công");
                 HopDongDAO.capnhatTinhTrang(maHD);
@@ -2048,16 +1971,20 @@ public class HopDongFrame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Thanh toán thất bại");
             }
         } else {
-            int maKM = Integer.parseInt(kmComboBox.getSelectedItem().toString());
+            int maKM = Integer.parseInt(maKMStr);
 
-            if (HoaDonDAO.themHoaDon(maKM, maHD, thanhtien, dichvu, maNV)) {
-                JOptionPane.showMessageDialog(null, "Thanh toán thành công");
-                HopDongDAO.capnhatTinhTrang(maHD);
-                XacNhanPanel.setVisible(false);
-                bill();
-                HoaDonPanel.setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(null, "Thanh toán thất bại");
+            try {
+                if (HoaDonDAO.themHoaDon(maKM, maHD, thanhtien, dichvu, maNV)) {
+                    JOptionPane.showMessageDialog(null, "Thanh toán thành công");
+                    HopDongDAO.capnhatTinhTrang(maHD);
+                    XacNhanPanel.setVisible(false);
+                    bill();
+                    HoaDonPanel.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Thanh toán thất bại");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(HopDongFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
       
         }
@@ -2121,7 +2048,6 @@ public class HopDongFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextPane BillTextPane;
-    private javax.swing.JLabel CCCDjLabel;
     private javax.swing.JLabel ChamCongLb;
     private javax.swing.JLabel DangXuatLb;
     private javax.swing.JPanel DichVuHong;
@@ -2145,7 +2071,6 @@ public class HopDongFrame extends javax.swing.JFrame {
     private javax.swing.JLabel giatbDV1;
     private javax.swing.JLabel gioiTinhjLabel;
     private javax.swing.JLabel hangkh;
-    private javax.swing.JLabel hoTenjLable;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -2160,7 +2085,6 @@ public class HopDongFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -2179,8 +2103,6 @@ public class HopDongFrame extends javax.swing.JFrame {
     private javax.swing.JSpinner slDV;
     private javax.swing.JButton sua_huyjButton;
     private javax.swing.JButton sua_luujButton;
-    private javax.swing.JTextField sua_slNguoiLonjTextField;
-    private javax.swing.JTextField sua_slTreEmjTextField;
     private javax.swing.JComboBox<String> sua_tinhTrangHDjComboBox;
     private javax.swing.JButton suajButton;
     private Image.SVGImage svgCC;

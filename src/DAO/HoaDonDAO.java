@@ -4,6 +4,7 @@ import Model.KhachHangModel;
 import Connection.JDBCUtil;
 import Model.HoaDonModel;
 import Model.HopDongModel;
+import DAO.ThongKeDAO;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.sql.Connection;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
+import java.sql.Timestamp;
+
 
 public class HoaDonDAO {
 
@@ -95,17 +98,17 @@ public class HoaDonDAO {
         return hoaDon;
     }
 
-    public static ArrayList<Vector> getDataHD() {
-        ArrayList<Vector> DSHD = new ArrayList<>();
+    public static ArrayList<Vector<Object>> getDataHD() {
+        ArrayList<Vector<Object>> DSHD = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         try {
             String sql = "select HOPDONG.MaKH,HOADON.MaHD ,TAOHOADON.MaNV ,HOADON.TongTien,HOADON.NgayLapHD FROM HOADON INNER JOIN TAOHOADON ON HOADON.MaHD=TAOHOADON.MaHD INNER JOIN HOPDONG ON HOADON.MaHopDong=HOPDONG.MaHopDong ORDER BY MAHD DESC";
             Connection con = JDBCUtil.getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")); // Định dạng tiền tệ cho Việt Nam
+            NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN")); // Định dạng tiền tệ cho Việt Nam
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
                 DSHD.add(row);
                 row.add(rs.getInt("MaHD"));
                 row.add(rs.getInt("MaKH"));
@@ -124,8 +127,8 @@ public class HoaDonDAO {
         return DSHD;
     }
 
-    public static ArrayList<Vector> getDSHDTheoTenKhachHang(String tenKhachHang) {
-        ArrayList<Vector> DSHD = new ArrayList<>();
+    public static ArrayList<Vector<Object>> getDSHDTheoTenKhachHang(String tenKhachHang) {
+        ArrayList<Vector<Object>> DSHD = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         try {
             // Câu truy vấn SQL kết nối các bảng và truy xuất thông tin dựa trên tên khách hàng
@@ -144,11 +147,11 @@ public class HoaDonDAO {
             ps.setString(1, "%" + tenKhachHang + "%");
 
             ResultSet rs = ps.executeQuery();
-            NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+            NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
 
             // Xử lý kết quả trả về từ truy vấn
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
                 row.add(rs.getInt("MaHD"));
                 row.add(rs.getInt("MaKH"));
                 row.add(rs.getInt("MaNV"));
@@ -167,8 +170,8 @@ public class HoaDonDAO {
         return DSHD;
     }
 
-    public static ArrayList<Vector> getDSHDTheoNgayVaTen(String ngay, String tenKhachHang) {
-        ArrayList<Vector> DSHD = new ArrayList<>();
+    public static ArrayList<Vector<Object>> getDSHDTheoNgayVaTen(String ngay, String tenKhachHang) {
+        ArrayList<Vector<Object>> DSHD = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         try {
             String sql = "SELECT HOADON.MaHD, KHACHHANG.MaKH, KHACHHANG.TenKH, TAOHOADON.MaNV, HOADON.TongTien, HOADON.NgayLapHD "
@@ -185,10 +188,10 @@ public class HoaDonDAO {
             ps.setString(2, "%" + tenKhachHang + "%");
 
             ResultSet rs = ps.executeQuery();
-            NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+            NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
 
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
                 row.add(rs.getInt("MaHD"));
                 row.add(rs.getInt("MaKH"));
                 row.add(rs.getInt("MaNV"));
@@ -207,61 +210,78 @@ public class HoaDonDAO {
         return DSHD;
     }
 
-    public static ArrayList<Vector> getCTHD(int MaHD) {
-        ArrayList<Vector> cthdList = new ArrayList<>();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = JDBCUtil.getConnection();
-            String sql = "SELECT PHONG.MaPhong, PHONG.Gia, HOPDONG.HinhThucThue, HOPDONG.TGNhanPhong, HOPDONG.TGTraPhong "
-                    + "FROM HOADON "
-                    + "JOIN HOPDONG ON HOADON.MaHopDong = HOPDONG.MaHopDong "
-                    + "JOIN CHITIETDATPHONG ON HOPDONG.MaHopDong = CHITIETDATPHONG.MaHopDong "
-                    + "JOIN PHONG ON CHITIETDATPHONG.MaPhong = PHONG.MaPhong "
-                    + "WHERE HOADON.MaHD = ?";
-            ps = con.prepareStatement(sql);
-            ps.setInt(1, MaHD);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Vector cthd = new Vector<>();
-                HopDongModel hopdong = HopDongDAO.getHDtheoMaHopDong(MaHD);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-                String ngayden = hopdong.getTGNhanPhong().format(formatter);
-                String ngaydi = hopdong.getTGTraPhong().format(formatter);
-                System.out.println("ngay den: " + ngayden);
-                System.out.println("ngay di " + ngaydi);
-                long sogio = tinhThoiGian(ngayden, ngaydi) / 60;
-                long songay = tinhKhoangCach2Ngay(ngayden, ngaydi);
-                System.out.println("so ngay: " + songay);
-                double tongTienThue = 0;
-                if ("Ngày".equals(rs.getString("HinhThucThue"))) {
-                    tongTienThue = songay * rs.getDouble("Gia"); // Thuê theo ngày
-                } else if ("Giờ".equals(rs.getString("HinhThucThue"))) {
-                    tongTienThue = (sogio / 22.0) * rs.getDouble("Gia") * 1.5; // Thuê theo giờ
+    public static ArrayList<Vector<Object>> getCTHD(int maHD) {
+        ArrayList<Vector<Object>> list = new ArrayList<>();
+        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        String sql = """
+            SELECT
+                P.MaPhong,
+                CTDP.SoKhach,
+                L.Gia AS GiaPhong,
+                H.HinhThucThue,
+                H.TGNhanPhong,
+                H.TGTraPhong
+            FROM HOADON HD
+            JOIN HOPDONG H ON HD.MaHopDong = H.MaHopDong
+            JOIN CHITIETDATPHONG CTDP ON H.MaHopDong = CTDP.MaHopDong
+            JOIN PHONG P ON CTDP.MaPhong = P.MaPhong
+            JOIN LOAIPHONG L ON P.MaLoai = L.MaLoai
+            WHERE HD.MaHD = ?
+        """;
+
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, maHD);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Vector<Object> row = new Vector<>();
+
+                    int maPhong = rs.getInt("MaPhong");
+                    int soKhach = rs.getInt("SoKhach");
+                    double giaPhong = rs.getDouble("GiaPhong");
+                    String hinhThuc = rs.getString("HinhThucThue");
+
+                    Timestamp tsNhan = rs.getTimestamp("TGNhanPhong");
+                    Timestamp tsTra  = rs.getTimestamp("TGTraPhong");
+
+                    LocalDateTime nhan = tsNhan.toLocalDateTime();
+                    LocalDateTime tra  = tsTra.toLocalDateTime();
+
+                    long tongPhut = ChronoUnit.MINUTES.between(nhan, tra);
+                    long soGio = tongPhut / 60;
+                    long soNgay = ChronoUnit.DAYS.between(nhan.toLocalDate(), tra.toLocalDate());
+
+                    double tien = 0;
+                    if ("Ngày".equalsIgnoreCase(hinhThuc)) {
+                        tien = soNgay * giaPhong;
+                    } else if ("Giờ".equalsIgnoreCase(hinhThuc)) {
+                        tien = (soGio / 22.0) * giaPhong * 1.5;
+                    }
+
+                    row.add(maPhong);
+                    row.add(soKhach); // nếu JTable chưa có cột này thì xóa dòng này
+                    row.add(hinhThuc);
+                    row.add(nhan.toLocalDate().format(dateFmt));
+                    row.add(tra.toLocalDate().format(dateFmt));
+                    row.add(String.format("%,.0f VND", tien));
+
+                    list.add(row);
                 }
-                String formattedTongTienThue = String.format("%,.0f VND", tongTienThue);
-                cthd.add(rs.getInt("MaPhong"));
-                cthd.add(rs.getString("HinhThucThue"));
-                java.sql.Date ngaynp = rs.getDate("TGNhanPhong");
-                String formattedDatenp = (ngaynp != null) ? ngaynp.toLocalDate().format(dateFormatter) : null;
-                java.sql.Date ngaytp = rs.getDate("TGTraPhong");
-                String formattedDatetp = (ngaytp != null) ? ngaytp.toLocalDate().format(dateFormatter) : null;
-                cthd.add(formattedDatenp);
-                cthd.add(formattedDatetp);
-                cthd.add(formattedTongTienThue);
-                cthdList.add(cthd);
             }
-            con.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return cthdList;
+
+        return list;
     }
 
-    public static ArrayList<Vector> getDSHDTheoNgay(String ngay) {
-        ArrayList<Vector> DSHD = new ArrayList<>();
+
+    public static ArrayList<Vector<Object>> getDSHDTheoNgay(String ngay) {
+        ArrayList<Vector<Object>> DSHD = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         try {
             String sql = "select HOPDONG.MaKH, HOADON.MaHD, TAOHOADON.MaNV, HOADON.TongTien, HOADON.NgayLapHD FROM HOADON INNER JOIN TAOHOADON ON HOADON.MaHD=TAOHOADON.MaHD INNER JOIN HOPDONG ON HOADON.MaHopDong=HOPDONG.MaHopDong WHERE NgayLapHD = TO_DATE(?,'DD-MM-YYYY')";
@@ -269,9 +289,9 @@ public class HoaDonDAO {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, ngay); // Thêm giá trị ngay vào PreparedStatement
             ResultSet rs = ps.executeQuery();
-            NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")); // Định dạng tiền tệ cho Việt Nam
+            NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN")); // Định dạng tiền tệ cho Việt Nam
             while (rs.next()) {
-                Vector row = new Vector();
+                Vector<Object> row = new Vector<>();
 
                 row.add(rs.getInt("MaHD"));
                 row.add(rs.getInt("MaKH"));
@@ -339,48 +359,60 @@ public class HoaDonDAO {
         return row;
     }
 
-    public static boolean themHoaDon(int maKM, int maHopDong, double tongtien, double dichvu, int maNV) {
-        String sqlInsertHoaDon = "INSERT INTO HOADON VALUES (HoaDon_Seq.NEXTVAL, ?, ?, ?, ?, ?)";
-        String sqlInsertTaoHoaDon = "INSERT INTO TAOHOADON (MaHD, MaNV) VALUES (?, ?)";
+    public static boolean themHoaDon(
+            int maKM,
+            int maHopDong,
+            double tongTien,
+            double tienHongTB,
+            int maNV
+    ) throws SQLException {
+        String sqlInsertHoaDon
+                = "INSERT INTO HOADON ("
+                + "MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB"
+                + ") VALUES (HoaDon_Seq.NEXTVAL, ?, ?, ?, ?, ?)";
 
-        try (Connection con = JDBCUtil.getConnection(); PreparedStatement psHoaDon = con.prepareStatement(sqlInsertHoaDon, new String[]{"MaHD"}); PreparedStatement psTaoHoaDon = con.prepareStatement(sqlInsertTaoHoaDon)) {
+        String sqlInsertTaoHoaDon
+                = "INSERT INTO TAOHOADON (MaHD, MaNV) VALUES (?, ?)";
 
-            con.setAutoCommit(false); // Bắt đầu giao dịch
+        try (Connection con = JDBCUtil.getConnection()) {
 
-            LocalDate currentDate = LocalDate.now();
-            psHoaDon.setInt(1, maKM);
-            psHoaDon.setInt(2, maHopDong);
-            psHoaDon.setDate(3, java.sql.Date.valueOf(currentDate));
-            psHoaDon.setDouble(4, tongtien);
-            psHoaDon.setDouble(5, dichvu);
-            psHoaDon.executeUpdate();
+            con.setAutoCommit(false);
 
-            // Lấy mã hóa đơn vừa được tạo
-            try (ResultSet rs = psHoaDon.getGeneratedKeys()) {
-                if (rs.next()) {
+            try (
+                    PreparedStatement psHoaDon
+                    = con.prepareStatement(sqlInsertHoaDon, new String[]{"MaHD"}); PreparedStatement psTaoHoaDon
+                    = con.prepareStatement(sqlInsertTaoHoaDon)) {
+
+                psHoaDon.setInt(1, maKM);
+                psHoaDon.setInt(2, maHopDong);
+                psHoaDon.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
+                psHoaDon.setDouble(4, tongTien);
+                psHoaDon.setDouble(5, tienHongTB);
+
+                psHoaDon.executeUpdate();
+
+                // Lấy MaHD vừa tạo
+                try (ResultSet rs = psHoaDon.getGeneratedKeys()) {
+                    if (!rs.next()) {
+                        throw new SQLException("Không lấy được MaHD");
+                    }
+
                     int maHD = rs.getInt(1);
 
-                    // Thêm vào bảng TAOHOADON
                     psTaoHoaDon.setInt(1, maHD);
                     psTaoHoaDon.setInt(2, maNV);
                     psTaoHoaDon.executeUpdate();
                 }
-            }
 
-            con.commit(); // Commit giao dịch
-            return true;
+                con.commit(); // Commit giao dịch
+                ThongKeDAO.capNhatThongKeTheoHoaDon(maHopDong);
+                return true;
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            try (Connection con = JDBCUtil.getConnection()) {
-                if (con != null) {
-                    con.rollback(); // Rollback giao dịch nếu có lỗi
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
             }
         }
-        return false;
     }
 
     public static long tinhThoiGian(String checkInDateTime, String checkOutDateTime) {
@@ -433,6 +465,7 @@ public class HoaDonDAO {
             }
 
             con.commit(); // Commit giao dịch
+            ThongKeDAO.capNhatThongKeTheoHoaDon(maHopDong);
             return true;
 
         } catch (SQLException ex) {
@@ -485,15 +518,15 @@ public class HoaDonDAO {
         }
         return DS_HD;
     }
-    
-    public static ArrayList<Vector> getDoanhThuTheoNam() {
-        ArrayList<Vector> DS_DoanhThu = new ArrayList<>();
+
+    public static ArrayList<Vector<Object>> getDoanhThuTheoNam() {
+        ArrayList<Vector<Object>> DS_DoanhThu = new ArrayList<>();
 
         try {
             String sql = "SELECT SUM(H.TONGTIEN) AS doanh_thu, EXTRACT(YEAR FROM H.NGAYLAPHD) AS nam "
                     + "FROM HOADON H "
                     + "GROUP BY EXTRACT(YEAR FROM H.NGAYLAPHD)";
-            
+
             Connection con = JDBCUtil.getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -513,5 +546,5 @@ public class HoaDonDAO {
         }
         return DS_DoanhThu;
     }
-    
+
 }

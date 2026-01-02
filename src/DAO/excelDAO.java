@@ -93,7 +93,7 @@ public class excelDAO {
         cell.setCellValue("Năm");
 
         // Lấy dữ liệu từ phương thức getSoKHTrongThang
-        ArrayList<Vector> arr_soKH = HopDongDAO.getSoKHTrongThang();
+        ArrayList<Vector<Object>> arr_soKH = HopDongDAO.getSoKHTrongThang();
 
         // Điền dữ liệu vào sheet
         for (int i = 0; i < arr_soKH.size(); i++) {
@@ -142,7 +142,7 @@ public class excelDAO {
         cell.setCellValue("Năm");
 
         // Lấy dữ liệu từ phương thức getSoKHTrongThang
-        ArrayList<Vector> arr_soKH = HopDongDAO.getHTThuePhong();
+        ArrayList<Vector<Object>> arr_soKH = HopDongDAO.getHTThuePhong();
 
         // Điền dữ liệu vào sheet
         for (int i = 0; i < arr_soKH.size(); i++) {
@@ -190,7 +190,7 @@ public class excelDAO {
         cell.setCellValue("Năm");
 
         // Lấy dữ liệu từ phương thức getDoanhThuTheoNam
-        ArrayList<Vector> arr_doanhThu = HoaDonDAO.getDoanhThuTheoNam();
+        ArrayList<Vector<Object>> arr_doanhThu = HoaDonDAO.getDoanhThuTheoNam();
 
         // Điền dữ liệu vào sheet
         for (int i = 0; i < arr_doanhThu.size(); i++) {
