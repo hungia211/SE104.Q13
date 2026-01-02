@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
+import java.sql.Timestamp;
+
 
 public class HoaDonDAO {
 
@@ -208,39 +210,65 @@ public class HoaDonDAO {
         return DSHD;
     }
 
-    public static ArrayList<Vector<Object>> getCTHD(int MaHD) {
-        ArrayList<Vector<Object>> cthdList = new ArrayList<>();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            con = JDBCUtil.getConnection();
-            String sql = "SELECT PHONG.MaPhong, PHONG.Gia, HOPDONG.HinhThucThue, HOPDONG.TGNhanPhong, HOPDONG.TGTraPhong "
-                    + "FROM HOADON "
-                    + "JOIN HOPDONG ON HOADON.MaHopDong = HOPDONG.MaHopDong "
-                    + "JOIN CHITIETDATPHONG ON HOPDONG.MaHopDong = CHITIETDATPHONG.MaHopDong "
-                    + "JOIN PHONG ON CHITIETDATPHONG.MaPhong = PHONG.MaPhong "
-                    + "WHERE HOADON.MaHD = ?";
-            ps = con.prepareStatement(sql);
-            ps.setInt(1, MaHD);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Vector<Object> cthd = new Vector<>();
-                HopDongModel hopdong = HopDongDAO.getHDtheoMaHopDong(MaHD);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-                String ngayden = hopdong.getTGNhanPhong().format(formatter);
-                String ngaydi = hopdong.getTGTraPhong().format(formatter);
-                System.out.println("ngay den: " + ngayden);
-                System.out.println("ngay di " + ngaydi);
-                long sogio = tinhThoiGian(ngayden, ngaydi) / 60;
-                long songay = tinhKhoangCach2Ngay(ngayden, ngaydi);
-                System.out.println("so ngay: " + songay);
-                double tongTienThue = 0;
-                if ("Ngày".equals(rs.getString("HinhThucThue"))) {
-                    tongTienThue = songay * rs.getDouble("Gia"); // Thuê theo ngày
-                } else if ("Giờ".equals(rs.getString("HinhThucThue"))) {
-                    tongTienThue = (sogio / 22.0) * rs.getDouble("Gia") * 1.5; // Thuê theo giờ
+    public static ArrayList<Vector<Object>> getCTHD(int maHD) {
+        ArrayList<Vector<Object>> list = new ArrayList<>();
+        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        String sql = """
+            SELECT
+                P.MaPhong,
+                CTDP.SoKhach,
+                L.Gia AS GiaPhong,
+                H.HinhThucThue,
+                H.TGNhanPhong,
+                H.TGTraPhong
+            FROM HOADON HD
+            JOIN HOPDONG H ON HD.MaHopDong = H.MaHopDong
+            JOIN CHITIETDATPHONG CTDP ON H.MaHopDong = CTDP.MaHopDong
+            JOIN PHONG P ON CTDP.MaPhong = P.MaPhong
+            JOIN LOAIPHONG L ON P.MaLoai = L.MaLoai
+            WHERE HD.MaHD = ?
+        """;
+
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, maHD);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Vector<Object> row = new Vector<>();
+
+                    int maPhong = rs.getInt("MaPhong");
+                    int soKhach = rs.getInt("SoKhach");
+                    double giaPhong = rs.getDouble("GiaPhong");
+                    String hinhThuc = rs.getString("HinhThucThue");
+
+                    Timestamp tsNhan = rs.getTimestamp("TGNhanPhong");
+                    Timestamp tsTra  = rs.getTimestamp("TGTraPhong");
+
+                    LocalDateTime nhan = tsNhan.toLocalDateTime();
+                    LocalDateTime tra  = tsTra.toLocalDateTime();
+
+                    long tongPhut = ChronoUnit.MINUTES.between(nhan, tra);
+                    long soGio = tongPhut / 60;
+                    long soNgay = ChronoUnit.DAYS.between(nhan.toLocalDate(), tra.toLocalDate());
+
+                    double tien = 0;
+                    if ("Ngày".equalsIgnoreCase(hinhThuc)) {
+                        tien = soNgay * giaPhong;
+                    } else if ("Giờ".equalsIgnoreCase(hinhThuc)) {
+                        tien = (soGio / 22.0) * giaPhong * 1.5;
+                    }
+
+                    row.add(maPhong);
+                    row.add(soKhach); // nếu JTable chưa có cột này thì xóa dòng này
+                    row.add(hinhThuc);
+                    row.add(nhan.toLocalDate().format(dateFmt));
+                    row.add(tra.toLocalDate().format(dateFmt));
+                    row.add(String.format("%,.0f VND", tien));
+
+                    list.add(row);
                 }
             }
 
@@ -248,8 +276,9 @@ public class HoaDonDAO {
             e.printStackTrace();
         }
 
-        return cthdList;
+        return list;
     }
+
 
     public static ArrayList<Vector<Object>> getDSHDTheoNgay(String ngay) {
         ArrayList<Vector<Object>> DSHD = new ArrayList<>();
@@ -336,7 +365,7 @@ public class HoaDonDAO {
             double tongTien,
             double tienHongTB,
             int maNV
-    ) {
+    ) throws SQLException {
         String sqlInsertHoaDon
                 = "INSERT INTO HOADON ("
                 + "MaHD, MaKM, MaHopDong, NgayLapHD, TongTien, TienHongTB"
@@ -347,7 +376,7 @@ public class HoaDonDAO {
 
         try (Connection con = JDBCUtil.getConnection()) {
 
-            con.setAutoCommit(false); 
+            con.setAutoCommit(false);
 
             try (
                     PreparedStatement psHoaDon
@@ -375,13 +404,14 @@ public class HoaDonDAO {
                     psTaoHoaDon.executeUpdate();
                 }
 
-            con.commit(); // Commit giao dịch
-            ThongKeDAO.capNhatThongKeTheoHoaDon(maHopDong);
-            return true;
+                con.commit(); // Commit giao dịch
+                ThongKeDAO.capNhatThongKeTheoHoaDon(maHopDong);
+                return true;
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
         }
     }
 
@@ -488,7 +518,7 @@ public class HoaDonDAO {
         }
         return DS_HD;
     }
-    
+
     public static ArrayList<Vector<Object>> getDoanhThuTheoNam() {
         ArrayList<Vector<Object>> DS_DoanhThu = new ArrayList<>();
 

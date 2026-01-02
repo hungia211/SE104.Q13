@@ -118,6 +118,30 @@ public class PhongFrame extends javax.swing.JFrame {
         danhSachPHONGTable.setModel(defaultTableModel);
         danhSachPHONGTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     }
+    
+    private void loadLoaiPhongToComboBox() {
+        jComboBox1.removeAllItems(); // xóa item mặc định
+        
+        jComboBox1.addItem("Tất cả");
+
+        try {
+            ArrayList<String> dsLoaiPhong = PhongDAO.getDanhSachTenLoaiPhong();
+
+            for (String tenLoai : dsLoaiPhong) {
+                jComboBox1.addItem(tenLoai);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                this,
+                "Không tải được danh sách loại phòng!",
+                "Lỗi",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
 
     public void inDanhSach() {
         // Tạo đối tượng danh sách phòng
@@ -147,6 +171,7 @@ public class PhongFrame extends javax.swing.JFrame {
             // Thiết lập chiều rộng cột + padding
             column.setPreferredWidth(maxWidth + 30);
         }
+        loadLoaiPhongToComboBox();
     }
 
     public String doiNgay(Date d) {

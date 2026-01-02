@@ -1973,14 +1973,18 @@ public class HopDongFrame extends javax.swing.JFrame {
         } else {
             int maKM = Integer.parseInt(maKMStr);
 
-            if (HoaDonDAO.themHoaDon(maKM, maHD, thanhtien, dichvu, maNV)) {
-                JOptionPane.showMessageDialog(null, "Thanh toán thành công");
-                HopDongDAO.capnhatTinhTrang(maHD);
-                XacNhanPanel.setVisible(false);
-                bill();
-                HoaDonPanel.setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(null, "Thanh toán thất bại");
+            try {
+                if (HoaDonDAO.themHoaDon(maKM, maHD, thanhtien, dichvu, maNV)) {
+                    JOptionPane.showMessageDialog(null, "Thanh toán thành công");
+                    HopDongDAO.capnhatTinhTrang(maHD);
+                    XacNhanPanel.setVisible(false);
+                    bill();
+                    HoaDonPanel.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Thanh toán thất bại");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(HopDongFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
       
         }
