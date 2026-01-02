@@ -705,6 +705,22 @@ public class PhongDAO {
             return false;
         }
     }
+    
+    public static ArrayList<String> getDanhSachTenLoaiPhong() throws SQLException {
+        ArrayList<String> list = new ArrayList<>();
 
+        String sql = "SELECT TenLoai FROM LOAIPHONG ORDER BY TenLoai";
+
+        try (Connection con = JDBCUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(rs.getString("TenLoai"));
+            }
+        }
+
+        return list;
+    }
 
 }
